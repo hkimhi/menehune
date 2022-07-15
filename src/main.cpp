@@ -24,7 +24,7 @@
 #define I_TURN 0.000
 #define D_TURN -0.0
 #define P_DRIVE 0.1
-#define I_DRIVE 0.0
+#define I_DRIVE 0.001
 #define D_DRIVE -0.0
 #define FF 0.2
 
@@ -97,11 +97,11 @@ void loop() {
   
   printGyro();
   PIDDrive(8.5 * 48,a,g,temp);
-  PIDTurn(45, a,g,temp);
-  PIDDrive(3.8 * 48,a,g,temp);
-  PIDTurn(45, a,g,temp);
+  PIDTurn(43, a,g,temp);
+  PIDDrive(4.2 * 48,a,g,temp);
+  PIDTurn(43, a,g,temp);
   PIDDrive(5 * 48,a,g,temp);
-
+  
   while(1){}
   //PIDTurn(30, a,g,temp);
   //PIDTurn(30, a,g,temp);
@@ -200,8 +200,11 @@ void PIDTurn(float setPoint, sensors_event_t a, sensors_event_t g, sensors_event
     prevError = error;
     if((power) > sat) power = sat;
     else if(power < -sat) power = -sat;
-    if(abs(error + prevError) < 1){
-      turn = false;
+    if(abs(error + prevError) < 0.5){
+      delay(100);
+      if((setPoint - (z * CONV)) < 0.5){
+        turn = false;
+      }
     }
     driveMotor(LEFT_FOWARD, LEFT_REVERSE, -power);
     driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, power);
