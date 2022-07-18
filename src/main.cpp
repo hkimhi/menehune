@@ -2,9 +2,9 @@
 #include <Adafruit_SSD1306.h>
 
 #define LED_BUILTIN PB2
-#define REFLECTANCE_INPUT PA0
-#define POT_INPUT PA1
-#define COMPARATOR_INPUT PB0
+#define REFLECTANCE PA1
+#define POT PA0
+#define COMPARATOR PB0
 
 #define POLL_RATE 100
 
@@ -15,9 +15,9 @@ Adafruit_SSD1306 display_handler(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET)
 
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
-  pinMode(REFLECTANCE_INPUT, INPUT);
-  pinMode(POT_INPUT, INPUT);
-  pinMode(COMPARATOR_INPUT, INPUT_PULLUP);
+  pinMode(REFLECTANCE, INPUT);
+  pinMode(POT, INPUT);
+  pinMode(COMPARATOR, INPUT_PULLUP);
 
   display_handler.begin(SSD1306_SWITCHCAPVCC, 0x3C);
   display_handler.setTextSize(1);
@@ -40,8 +40,8 @@ void loop() {
 
   display_handler.setCursor(0,0);
   display_handler.clearDisplay();
-  display_handler.print("Reflectance: "); display_handler.println(analogRead(REFLECTANCE_INPUT));
-  display_handler.print("Potentiometer: "); display_handler.println(analogRead(POT_INPUT));
-  display_handler.print("Comparator: "); display_handler.println(digitalRead(COMPARATOR_INPUT));
+  display_handler.print("Reflectance: "); display_handler.println(analogRead(REFLECTANCE));
+  display_handler.print("Potentiometer: "); display_handler.println(analogRead(POT));
+  display_handler.print("Comparator: "); display_handler.println(digitalRead(COMPARATOR));
   display_handler.display();
 }
