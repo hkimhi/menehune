@@ -20,11 +20,11 @@
 #define YOFF -0.10
 #define ZOFF 0.01
 #define CONV 1
-#define P_TURN 0.3
-#define I_TURN 0.000
-#define D_TURN -0.0
-#define P_DRIVE 0.1
-#define I_DRIVE 0.001
+#define P_TURN 1  
+#define I_TURN 0.03
+#define D_TURN 0.1
+#define P_DRIVE 0.005
+#define I_DRIVE 0.000
 #define D_DRIVE -0.0
 #define FF 0.2
 
@@ -38,16 +38,18 @@ void driveMotor(PinName fowardPin, PinName reversePin, float power);
 void PIDTurn(float setPoint, sensors_event_t a, sensors_event_t g, sensors_event_t temp);
 void PIDDrive(float setPoint, sensors_event_t a, sensors_event_t g, sensors_event_t temp);
 int sign(float in);
+void calibGyro(sensors_event_t a, sensors_event_t g, sensors_event_t temp);
 
 Adafruit_SSD1306 display_handler(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 Adafruit_MPU6050 mpu;
 volatile float x,y,z = 0;
 volatile float counter = 0;
+float xOff, yOff, zOff = 0;
 volatile int dir = 1;
 float vx, vy, vz, dx,dy,dz = 0;
 bool turn = false;
 bool drive  = false;
- 
+sensors_event_t a, g, temp;
 
 void setup(void) {
   pinMode(DIO_READ_PIN, INPUT_PULLUP);
@@ -84,23 +86,29 @@ void setup(void) {
   
   mpu.setGyroRange(MPU6050_RANGE_500_DEG);
   mpu.setFilterBandwidth(MPU6050_BAND_94_HZ);
-  
-
+  calibGyro(a,g,temp);
   delay(100);
 }
 
 void loop() {
  
   /* Get new sensor events with the readings */
-  sensors_event_t a, g, temp;
+  
   readGyro(a,g,temp);
   
   printGyro();
-  PIDDrive(8.5 * 48,a,g,temp);
-  PIDTurn(43, a,g,temp);
-  PIDDrive(4.2 * 48,a,g,temp);
-  PIDTurn(43, a,g,temp);
-  PIDDrive(5 * 48,a,g,temp);
+  //PIDTurn(45,a,g,temp);
+  //PIDDrive(40,a,g,temp);
+  PIDDrive(195, a,g,temp);
+  PIDTurn(-20, a,g,temp);
+  delay(500);
+  PIDTurn(20, a,g,temp);
+  delay(500);
+  PIDDrive(2, a,g,temp);
+  PIDTurn(45, a,g,temp);
+  PIDDrive(88, a,g,temp);
+  PIDTurn(45, a,g,temp);
+  PIDDrive(50, a,g,temp);
   
   while(1){}
   //PIDTurn(30, a,g,temp);
@@ -118,9 +126,16 @@ void encCount(){
 
 void readGyro(sensors_event_t a, sensors_event_t g, sensors_event_t temp){
    mpu.getEvent(&a, &g, &temp);
-  if(abs(g.gyro.x + XOFF) >= MIN_GYRO) x += g.gyro.x + XOFF;
-  if(abs(g.gyro.y + YOFF) >= MIN_GYRO) y += g.gyro.y + YOFF;
-  if(abs(g.gyro.z + ZOFF) >= MIN_GYRO) z += g.gyro.z + ZOFF;
+  if(abs(g.gyro.x + xOff) >= MIN_GYRO) x += g.gyro.x + xOff;
+  if(abs(g.gyro.y + yOff) >= MIN_GYRO) y += g.gyro.y + yOff;
+  if(abs(g.gyro.z + zOff) >= MIN_GYRO) z += g.gyro.z + zOff;
+}
+
+void calibGyro(sensors_event_t a, sensors_event_t g, sensors_event_t temp){
+  mpu.getEvent(&a, &g, &temp);
+  xOff = -g.gyro.x;
+  yOff = -g.gyro.y;
+  zOff = -g.gyro.z;
 }
 
 void printGyro(){
@@ -174,13 +189,14 @@ void driveMotor(PinName fowardPin, PinName reversePin, float power){
  * Template PID code Using Turning as an example, setpoint is in degrees where + is CCW;
  */
 void PIDTurn(float setPoint, sensors_event_t a, sensors_event_t g, sensors_event_t temp){
-  float sat = 0.5;
+  float sat = 0.6;
   float iSat = 100;
   float error, prevError, errorSum = 0;
   float power;
   resetGyro();
   turn = true;
-  while(turn){
+  int gyCo = 0;
+  while(gyCo < 25){
     display_handler.clearDisplay();
     display_handler.setCursor(0,0);
 
@@ -193,6 +209,7 @@ void PIDTurn(float setPoint, sensors_event_t a, sensors_event_t g, sensors_event
     power += (error - prevError) * D_TURN;
     //Integrating Term
     power += errorSum * I_TURN;
+    power += sign(error) * FF; 
     if(abs(errorSum) > iSat) errorSum = errorSum / abs(errorSum) * iSat;
     //integrate Errors
     errorSum += error;
@@ -200,11 +217,8 @@ void PIDTurn(float setPoint, sensors_event_t a, sensors_event_t g, sensors_event
     prevError = error;
     if((power) > sat) power = sat;
     else if(power < -sat) power = -sat;
-    if(abs(error + prevError) < 0.5){
-      delay(100);
-      if((setPoint - (z * CONV)) < 0.5){
-        turn = false;
-      }
+    if(abs(error + prevError)/2 < 0.8){
+      gyCo++;
     }
     driveMotor(LEFT_FOWARD, LEFT_REVERSE, -power);
     driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, power);
@@ -223,18 +237,24 @@ void PIDTurn(float setPoint, sensors_event_t a, sensors_event_t g, sensors_event
 /**
  * Template PID code Using Turning as an example, setpoint is in degrees where + is CCW;
  */
-void PIDDrive(float setPoint, sensors_event_t a, sensors_event_t g, sensors_event_t temp){
-  float sat = 0.35;
+void PIDDrive(float dist, sensors_event_t a, sensors_event_t g, sensors_event_t temp){
+  float sat = 0.33;
   float iSat = 100;
+  float pTurn = 1;
   float error, prevError, errorSum = 0;
-  float power;
+  float turnError, turnSet;
+  float power, turnPower;
   int start = counter;
   drive = true;
+  float setPoint = (dist / (6.28 * 3.5)) * 48;
+  readGyro(a,g,temp);
+  turnSet = z;
   while(drive){
     display_handler.clearDisplay();
     display_handler.setCursor(0,0);
-
+    readGyro(a,g,temp);
     error = setPoint - (counter - start);
+    turnError = turnSet - z;
     //Proportioanl Term
     power = error * P_DRIVE;
     //Derivative Term
@@ -255,8 +275,11 @@ void PIDDrive(float setPoint, sensors_event_t a, sensors_event_t g, sensors_even
     if(error + prevError < 1){
       drive = false;
     }
-    driveMotor(LEFT_FOWARD, LEFT_REVERSE, power);
-    driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, power);
+    delay(50);
+    turnPower = (turnError * pTurn);
+    if(abs(turnPower) >  power) turnPower = power * sign(turnPower);
+    driveMotor(LEFT_FOWARD, LEFT_REVERSE, power - turnPower);
+    driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, power + turnPower);
     display_handler.println("Power");
     display_handler.println(power);
     display_handler.println("Error");
