@@ -26,7 +26,7 @@
 #define P_DRIVE 0.005
 #define I_DRIVE 0.000
 #define D_DRIVE -0.0
-#define FF 0.2
+#define FF 0.27
 
 void resetButton();
 void encCount();
@@ -98,8 +98,11 @@ void loop() {
   
   printGyro();
   //PIDTurn(45,a,g,temp);
+  //PIDTurn(-45,a,g,temp);
+
   //PIDDrive(40,a,g,temp);
   PIDDrive(195, a,g,temp);
+  delay(500);
   PIDTurn(-20, a,g,temp);
   delay(500);
   PIDTurn(20, a,g,temp);
@@ -221,7 +224,7 @@ void PIDTurn(float setPoint, sensors_event_t a, sensors_event_t g, sensors_event
       gyCo++;
     }
     driveMotor(LEFT_FOWARD, LEFT_REVERSE, -power);
-    driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, power);
+    //driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, power);
     display_handler.println("Power");
     display_handler.println(power);
     display_handler.println("Error");
