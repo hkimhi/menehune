@@ -5,6 +5,7 @@
 #include <Adafruit_SSD1306.h>
 #include <Wire.h>
 #include <math.h>
+#include <Servo.h>
 
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
@@ -16,17 +17,20 @@
 #define LEFT_REVERSE PA_7
 #define RIGHT_FOWARD PB_0
 #define RIGHT_REVERSE PB_1
+#define CLAW PA_2
 #define XOFF 0.03 //Calibated Offset Compensation
 #define YOFF -0.10
 #define ZOFF 0.01
 #define CONV 1
-#define P_TURN 1  
-#define I_TURN 0.03
-#define D_TURN 0.1
-#define P_DRIVE 0.005
+#define P_TURN 1     
+#define I_TURN 0.01
+#define D_TURN 1
+#define P_DRIVE 0.002
 #define I_DRIVE 0.000
-#define D_DRIVE -0.0
-#define FF 0.27
+#define D_DRIVE 0.01
+#define FFT 0.22
+#define FFD 0.0
+
 
 void resetButton();
 void encCount();
@@ -35,10 +39,11 @@ void resetGyro();
 void readGyro(sensors_event_t a, sensors_event_t g, sensors_event_t temp);
 void printGyro();
 void driveMotor(PinName fowardPin, PinName reversePin, float power);
-void PIDTurn(float setPoint, sensors_event_t a, sensors_event_t g, sensors_event_t temp);
+void PIDTurn(float setPoint, int dir, sensors_event_t a, sensors_event_t g, sensors_event_t temp);
 void PIDDrive(float setPoint, sensors_event_t a, sensors_event_t g, sensors_event_t temp);
 int sign(float in);
 void calibGyro(sensors_event_t a, sensors_event_t g, sensors_event_t temp);
+void openClaw(float angle);
 
 Adafruit_SSD1306 display_handler(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 Adafruit_MPU6050 mpu;
@@ -49,6 +54,8 @@ volatile int dir = 1;
 float vx, vy, vz, dx,dy,dz = 0;
 bool turn = false;
 bool drive  = false;
+bool go = false;
+Servo intakeServo;
 sensors_event_t a, g, temp;
 
 void setup(void) {
@@ -87,6 +94,7 @@ void setup(void) {
   mpu.setGyroRange(MPU6050_RANGE_500_DEG);
   mpu.setFilterBandwidth(MPU6050_BAND_94_HZ);
   calibGyro(a,g,temp);
+  intakeServo.attach(PA2);
   delay(100);
 }
 
@@ -96,31 +104,23 @@ void loop() {
   
   readGyro(a,g,temp);
   
-  printGyro();
-  //PIDTurn(45,a,g,temp);
-  //PIDTurn(-45,a,g,temp);
-
-  //PIDDrive(40,a,g,temp);
-  PIDDrive(195, a,g,temp);
-  delay(500);
-  PIDTurn(-20, a,g,temp);
-  delay(500);
-  PIDTurn(20, a,g,temp);
-  delay(500);
-  PIDDrive(2, a,g,temp);
-  PIDTurn(45, a,g,temp);
-  PIDDrive(88, a,g,temp);
-  PIDTurn(45, a,g,temp);
-  PIDDrive(50, a,g,temp);
+  printGyro(); 
+  PIDDrive(180, a,g,temp);
+  PIDTurn(-20,1, a,g,temp);
+  PIDTurn(20,1, a,g,temp);
+  PIDTurn(22.5,0, a,g,temp);
+  PIDTurn(22.5,1, a,g,temp);
+  PIDDrive(125, a,g,temp);
+  PIDTurn(-22.5,0, a,g,temp);
+  PIDDrive(16, a,g,temp);
+  PIDTurn(-22.5,0, a,g,temp);
+  PIDDrive(-50, a,g,temp);
   
   while(1){}
-  //PIDTurn(30, a,g,temp);
-  //PIDTurn(30, a,g,temp);
 }
 
 void resetButton(){
-  drive = !drive;
-  turn = !turn;
+  go = true;
 }
 
 void encCount(){
@@ -191,15 +191,15 @@ void driveMotor(PinName fowardPin, PinName reversePin, float power){
 /**
  * Template PID code Using Turning as an example, setpoint is in degrees where + is CCW;
  */
-void PIDTurn(float setPoint, sensors_event_t a, sensors_event_t g, sensors_event_t temp){
-  float sat = 0.6;
+void PIDTurn(float setPoint, int dir, sensors_event_t a, sensors_event_t g, sensors_event_t temp){
+  float sat = 0.7;
   float iSat = 100;
   float error, prevError, errorSum = 0;
   float power;
   resetGyro();
   turn = true;
   int gyCo = 0;
-  while(gyCo < 25){
+  while(gyCo < 10){
     display_handler.clearDisplay();
     display_handler.setCursor(0,0);
 
@@ -212,7 +212,7 @@ void PIDTurn(float setPoint, sensors_event_t a, sensors_event_t g, sensors_event
     power += (error - prevError) * D_TURN;
     //Integrating Term
     power += errorSum * I_TURN;
-    power += sign(error) * FF; 
+    power += sign(error) * FFT; 
     if(abs(errorSum) > iSat) errorSum = errorSum / abs(errorSum) * iSat;
     //integrate Errors
     errorSum += error;
@@ -220,11 +220,17 @@ void PIDTurn(float setPoint, sensors_event_t a, sensors_event_t g, sensors_event
     prevError = error;
     if((power) > sat) power = sat;
     else if(power < -sat) power = -sat;
-    if(abs(error + prevError)/2 < 0.8){
+    if(abs(error + prevError)/2 < 0.6){
       gyCo++;
     }
-    driveMotor(LEFT_FOWARD, LEFT_REVERSE, -power);
-    //driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, power);
+    if(dir == 1){
+      driveMotor(LEFT_FOWARD, LEFT_REVERSE, -power);
+      driveMotor(RIGHT_FOWARD, RIGHT_REVERSE,  sign(power) * 0.2);
+    }
+    else {
+      driveMotor(LEFT_FOWARD, LEFT_REVERSE, -sign(power) * 0.2);
+      driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, power);
+    }
     display_handler.println("Power");
     display_handler.println(power);
     display_handler.println("Error");
@@ -248,11 +254,12 @@ void PIDDrive(float dist, sensors_event_t a, sensors_event_t g, sensors_event_t 
   float turnError, turnSet;
   float power, turnPower;
   int start = counter;
+  int timeout = 0;
   drive = true;
   float setPoint = (dist / (6.28 * 3.5)) * 48;
   readGyro(a,g,temp);
   turnSet = z;
-  while(drive){
+  while(drive && (timeout < 10)){
     display_handler.clearDisplay();
     display_handler.setCursor(0,0);
     readGyro(a,g,temp);
@@ -264,23 +271,26 @@ void PIDDrive(float dist, sensors_event_t a, sensors_event_t g, sensors_event_t 
     power += (error - prevError) * D_DRIVE;
     //Integrating Term
     power += errorSum * I_DRIVE;
-    power += sign(error) * FF; 
+    power += sign(error) * FFD; 
     if(abs(errorSum) > iSat) errorSum = errorSum / abs(errorSum) * iSat;
     //integrate Errors
     errorSum += error;
     //Save Prev values for derivative
-    prevError = error;
     if(error <= 0) dir = -1;
     else if(error > 0) dir = 1;
-    power += sign(error) * FF;
+    power += sign(error) * FFD;
     if((power) > sat) power = sat;
     else if(power < -sat) power = -sat;
-    if(error + prevError < 1){
+    if(abs(error + prevError) <= 2){
       drive = false;
     }
+    if(prevError == error){
+      timeout++;
+    }
+    prevError = error;
     delay(50);
     turnPower = (turnError * pTurn);
-    if(abs(turnPower) >  power) turnPower = power * sign(turnPower);
+    if(abs(turnPower) >  abs(power)) turnPower = abs(power) * sign(turnPower);
     driveMotor(LEFT_FOWARD, LEFT_REVERSE, power - turnPower);
     driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, power + turnPower);
     display_handler.println("Power");
@@ -298,5 +308,9 @@ void PIDDrive(float dist, sensors_event_t a, sensors_event_t g, sensors_event_t 
 
 int sign(float in){
   return (0 < in) - (in < 0);
+}
+
+void openClaw(float angle){
+  intakeServo.write(220 * angle);
 }
 
