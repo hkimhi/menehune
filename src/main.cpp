@@ -2,11 +2,11 @@
 #include <Adafruit_SSD1306.h>
 
 #define LED_BUILTIN PB2
-#define REFLECTANCE PA1
+#define REFLECTANCE_ONE PB10
+#define REFLECTANCE_TWO PA10
+#define REFLECTANCE_THREE PB9
 #define POT PA0
-#define ANALOG_OUT PB1
-#define ANALOG_OUT_VAL PA7
-#define COMPARATOR PB0
+#define REFERENCE_ONE PB1
 
 #define POLL_RATE 100
 
@@ -17,10 +17,10 @@ Adafruit_SSD1306 display_handler(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET)
 
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
-  pinMode(REFLECTANCE, INPUT);
+  pinMode(REFLECTANCE_ONE, INPUT_PULLUP);
+  pinMode(REFLECTANCE_ONE, INPUT_PULLUP);
+  pinMode(REFLECTANCE_ONE, INPUT_PULLUP);
   pinMode(POT, INPUT);
-  pinMode(COMPARATOR, INPUT_PULLUP);
-  pinMode(ANALOG_OUT_VAL, INPUT);
 
   display_handler.begin(SSD1306_SWITCHCAPVCC, 0x3C);
   display_handler.setTextSize(1);
@@ -41,23 +41,20 @@ void loop() {
   digitalWrite(LED_BUILTIN, LOW);
   delay(POLL_RATE/2);
 
-  int analog_input = analogRead(POT);
-  int normalized_analog_input = map(analog_input, 0, 1023, 0, 255);
-  analogWrite(ANALOG_OUT, normalized_analog_input);
+  // int pot_val = analogRead(POT);
+  int pot_val = 475;
+  int duty_cycle_value = map(pot_val, 0, 1023, 0, 255); //convert raw pot input to duty cycle in range 0-255 for use in analogWrite
+  int pot_val_voltage = map(pot_val, 0, 1023, 0, 3300); //convert raw pot input to mV
+  int duty_cycle_percent = map(pot_val, 0, 1023, 0, 100); //convert raw pot input to duty cycle in %
+  analogWrite(REFERENCE_ONE, duty_cycle_value);
 
   display_handler.setCursor(0,0);
   display_handler.clearDisplay();
-  display_handler.print("Reflectance: "); display_handler.println(analogRead(REFLECTANCE));
 
-  display_handler.print("POT: ");
-  display_handler.print(analog_input);
-  display_handler.print(" | ");
-  display_handler.print(normalized_analog_input);
-  display_handler.print(" | ");
-  display_handler.print(map(analog_input, 0, 1023, 0, 3300));
-  display_handler.println("mV");
-  
-  display_handler.print("Comparator in: "); display_handler.println(ANALOG_OUT_VAL);
-  display_handler.print("Comparator: "); display_handler.println(digitalRead(COMPARATOR));
+  display_handler.printf("POT: %4imV | %2i\%\n", pot_val_voltage, duty_cycle_percent);
+  display_handler.printf("Reflectance 1: %i\n", digitalRead(REFLECTANCE_ONE));
+  display_handler.printf("Reflectance 2: %i\n", digitalRead(REFLECTANCE_TWO));
+  display_handler.printf("Reflectance 3: %i\n", digitalRead(REFLECTANCE_THREE));
+
   display_handler.display();
 }
