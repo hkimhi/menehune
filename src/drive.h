@@ -4,11 +4,14 @@
 #include <Adafruit_Sensor.h>
 #include <gyro.h>
 
+#define SCREEN_WIDTH 128 // OLED display width, in pixels
+#define SCREEN_HEIGHT 64 // OLED display height, in pixels
+#define OLED_RESET     -1 // This display does not have a reset pin accessible
 #define LEFT_FOWARD PB_10
 #define LEFT_REVERSE PB_11
 #define RIGHT_FOWARD PB_8
 #define RIGHT_REVERSE PB_9
-#define ENC_PIN PB11    
+#define ENC_PIN PB12    
 #define P_TURN 1     
 #define I_TURN 0.01
 #define D_TURN 1
@@ -30,11 +33,10 @@ int sign(float in);
 void encCount();
 void driveSetup(Adafruit_SSD1306 display);
 
-Adafruit_SSD1306 display_handler1;
+Adafruit_SSD1306 display_handler(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 void driveSetup(Adafruit_SSD1306 display){
     attachInterrupt(digitalPinToInterrupt(ENC_PIN), encCount, CHANGE);
-    display_handler1 = display;
 }
 
 void driveMotor(PinName fowardPin, PinName reversePin, float power){
@@ -93,15 +95,15 @@ void PIDTurn(float setPoint, int dir, sensors_event_t a, sensors_event_t g, sens
       driveMotor(LEFT_FOWARD, LEFT_REVERSE, -sign(power) * 0.2);
       driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, power);
     }
-    display_handler1.clearDisplay();
-    display_handler1.setCursor(0,0);
-    display_handler1.println("Power");
-    display_handler1.println(power);
-    display_handler1.println("Error");
-    display_handler1.println(error);
-    display_handler1.println(errorSum);
-    display_handler1.println(error - prevError);
-    display_handler1.display();
+    display_handler.clearDisplay();
+    display_handler.setCursor(0,0);
+    display_handler.println("Power");
+    display_handler.println(power);
+    display_handler.println("Error");
+    display_handler.println(error);
+    display_handler.println(errorSum);
+    display_handler.println(error - prevError);
+    display_handler.display();
   }
   driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0);
   driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0);
@@ -114,7 +116,7 @@ void PIDDrive(float dist, sensors_event_t a, sensors_event_t g, sensors_event_t 
   float sat = 0.33;
   float iSat = 100;
   float pTurn = 1;
-  float error, prevError, errorSum = 0;
+  int error, prevError, errorSum = 0;
   float turnError, turnSet;
   float power, turnPower;
   int start = counter;
@@ -156,15 +158,17 @@ void PIDDrive(float dist, sensors_event_t a, sensors_event_t g, sensors_event_t 
     if(abs(turnPower) >  abs(power)) turnPower = abs(power) * sign(turnPower);
     driveMotor(LEFT_FOWARD, LEFT_REVERSE, power - turnPower);
     driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, power + turnPower);
-    display_handler1.clearDisplay();
-    display_handler1.setCursor(0,0);
-    display_handler1.println("Power");
-    display_handler1.println(power);
-    display_handler1.println("Error");
-    display_handler1.println(error);
-    display_handler1.println(errorSum);
-    display_handler1.println(error - prevError);
-    display_handler1.display();
+    display_handler.clearDisplay();
+    display_handler.setCursor(0,0);
+    display_handler.println("Power");
+    display_handler.println(power);
+    display_handler.println("Error");
+    display_handler.println(error);
+    display_handler.println(errorSum);
+    display_handler.println(error - prevError);
+    display_handler.println("Timeout");
+    display_handler.println(timeout);
+    display_handler.display();
     
   }
   driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0);
