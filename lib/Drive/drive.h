@@ -23,8 +23,6 @@
 #define FFT 0.22
 #define FFD 0.0
 
-extern Adafruit_SSD1306 display1;
-
 void driveMotor(PinName fowardPin, PinName reversePin, float power);
 void PIDTurn(float setPoint, int dir, sensors_event_t a, sensors_event_t g, sensors_event_t temp);
 void PIDDrive(float setPoint, sensors_event_t a, sensors_event_t g, sensors_event_t temp);
@@ -32,6 +30,5 @@ void encCount();
 void driveSetup();
 void printDrive(float power, int error, int errorSum, int prevError);
 void printDrive(float power, int error, int errorSum, int prevError, int timeout);
-
 
 #endif

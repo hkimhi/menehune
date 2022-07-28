@@ -1,6 +1,8 @@
 #include "drive.h"
 
 // GLOBAL VARIABLES //
+extern Adafruit_SSD1306 display1;
+
 volatile float counter = 0;
 volatile int dir = 1;
 bool drive = false;
@@ -211,7 +213,7 @@ void printDrive(float power, int error, int errorSum, int prevError)
 
 /**
  * @brief Prints drive information to the display
- *uu
+ *
  * @return None
  */
 void printDrive(float power, int error, int errorSum, int prevError, int timeout)

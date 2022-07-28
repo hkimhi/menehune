@@ -2,6 +2,7 @@
 
 // GLOBAL VARIABLES //
 Adafruit_MPU6050 my_mpu;
+extern Adafruit_SSD1306 display1;
 
 float xOff, yOff, zOff = 0; // offsets for x, y, z positions
 volatile float x, y, z = 0; // will store value of x, y, z positions

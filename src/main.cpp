@@ -4,14 +4,15 @@
 #include <Wire.h>
 #include <math.h>
 #include <Servo.h>
+
 #include "drive.h"
 #include "gyro.h"
 #include "ir_sensor.h"
+#include "intake.h"
 
 // PIN I/O //
 #undef LED_BUILTIN
 #define LED_BUILTIN PB2
-#define CLAW_PIN PA2 // intake claw servo pin
 
 // CONSTANTS //
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
@@ -19,21 +20,32 @@
 #define OLED_RESET -1    // This display does not have a reset pin accessible
 Adafruit_SSD1306 display1(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
+extern int intakeServoClosedPosition;
+extern int intakeServoPosition;
+
 // FUNCTION DECLARATION //
 void resetButton();
-void openClaw(float angle);
-void printGyro();
 
 // GLOBAL VARIABLES //
-Servo intakeServo;    // servo used for claw intake
-sensors_event_t a;    // acceleration
-sensors_event_t g;    // gyro
-sensors_event_t temp; // temperature
+sensors_event_t a;    // acceleration sensor event
+sensors_event_t g;    // gyro sensor event
+sensors_event_t temp; // temperature sensor event
 
 void setup(void)
 {
   pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(SERVO_POS_POT, INPUT_ANALOG);
+  pinMode(BUMPER_SWITCH, INPUT_PULLUP);
+  pinMode(HALL_INPUT, INPUT_PULLUP);
+  pinMode(SWITCH_STATES_INPUT, INPUT_PULLUP);
+  intakeServo.attach(SERVO);
   display1.begin(SSD1306_SWITCHCAPVCC, 0x3C);
+
+  attachInterrupt(digitalPinToInterrupt(BUMPER_SWITCH), onHit, FALLING);     // SWITCH_INPUT is regular high (Switches in parallel with internal pull-up)
+  attachInterrupt(digitalPinToInterrupt(HALL_INPUT), onDetectBomb, FALLING); // HALL_INPUT is regular high
+  attachInterrupt(digitalPinToInterrupt(SWITCH_STATES_INPUT), switchStates, FALLING);
+
+  intakeServoClosedPosition = map(analogRead(SERVO_POS_POT), 0, 1023, 0, 120); // the servo has a range from 0 to 120 degrees
 
   calibrateGyro(a, g, temp);
   digitalWrite(LED_BUILTIN, HIGH);
@@ -47,13 +59,11 @@ void setup(void)
   display1.println("MPU6050 Found!");
   display1.display();
 
-  intakeServo.attach(CLAW_PIN);
   delay(100);
 }
 
 void loop()
 {
-  display1.display();
   PIDDrive(180, a, g, temp);
   PIDTurn(-20, 1, a, g, temp);
   PIDTurn(20, 1, a, g, temp);
@@ -66,15 +76,4 @@ void loop()
   PIDDrive(-50, a, g, temp);
 
   return;
-}
-
-/**
- * @brief Opens the intake claw to a specified angle
- *
- * @param angle the angle (in degrees) to open the claw
- * @return None
- */
-void openClaw(float angle)
-{
-  intakeServo.write(220 * angle);
 }
