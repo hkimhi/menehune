@@ -1,96 +1,80 @@
-// Basic demo for accelerometer readings from Adafruit MPU6050
-
 #include <Adafruit_MPU6050.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_SSD1306.h>
 #include <Wire.h>
 #include <math.h>
 #include <Servo.h>
-#include <drive.h>
+#include "drive.h"
+#include "gyro.h"
+#include "ir_sensor.h"
 
-#define DIO_READ_PIN PA0
-#define LED_BULTIN PB2
-#define CLAW PA_2
+// PIN I/O //
+#undef LED_BUILTIN
+#define LED_BUILTIN PB2
+#define CLAW_PIN PA2 // intake claw servo pin
 
+// CONSTANTS //
+#define SCREEN_WIDTH 128 // OLED display width, in pixels
+#define SCREEN_HEIGHT 64 // OLED display height, in pixels
+#define OLED_RESET -1    // This display does not have a reset pin accessible
+Adafruit_SSD1306 display1(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+
+// FUNCTION DECLARATION //
 void resetButton();
 void openClaw(float angle);
 void printGyro();
 
+// GLOBAL VARIABLES //
+Servo intakeServo;    // servo used for claw intake
+sensors_event_t a;    // acceleration
+sensors_event_t g;    // gyro
+sensors_event_t temp; // temperature
 
-
-bool go = false;
-Servo intakeServo;
-sensors_event_t a, g, temp;
-
-void setup(void) {
+void setup(void)
+{
   pinMode(LED_BUILTIN, OUTPUT);
-  pinMode(DIO_READ_PIN, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(DIO_READ_PIN), resetButton, FALLING);
-  display_handler.begin(SSD1306_SWITCHCAPVCC, 0x3C);
+  display1.begin(SSD1306_SWITCHCAPVCC, 0x3C);
 
-  calibGyro(a,g,temp, display_handler);
-  digitalWrite(PB2, HIGH);
-  driveSetup(display_handler);
+  calibrateGyro(a, g, temp);
+  digitalWrite(LED_BUILTIN, HIGH);
+  driveSetup();
   delay(2000);
 
-  display_handler.clearDisplay();
-  display_handler.setTextSize(1);
-  display_handler.setTextColor(SSD1306_WHITE);
-  display_handler.setCursor(0,0);
-  display_handler.println("MPU6050 Found!");
-  display_handler.display();
+  display1.clearDisplay();
+  display1.setTextSize(1);
+  display1.setTextColor(SSD1306_WHITE);
+  display1.setCursor(0, 0);
+  display1.println("MPU6050 Found!");
+  display1.display();
 
-  
-  intakeServo.attach(PA2);
+  intakeServo.attach(CLAW_PIN);
   delay(100);
 }
 
-void loop() {
-  digitalWrite(PB2, HIGH);
-  /* Get new sensor events with the readings */
-  
-  readGyro(a,g,temp);
-  printGyro();
-  driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.45);
-  delay(250);
-  //driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0);
-  printGyro();
+void loop()
+{
+  display1.display();
+  PIDDrive(180, a, g, temp);
+  PIDTurn(-20, 1, a, g, temp);
+  PIDTurn(20, 1, a, g, temp);
+  PIDTurn(22.5, 0, a, g, temp);
+  PIDTurn(22.5, 1, a, g, temp);
+  PIDDrive(125, a, g, temp);
+  PIDTurn(-22.5, 0, a, g, temp);
+  PIDDrive(16, a, g, temp);
+  PIDTurn(-22.5, 0, a, g, temp);
+  PIDDrive(-50, a, g, temp);
 
-  digitalWrite(PB2, LOW);
-  delay(250);
-
-  /*PIDDrive(180, a,g,temp);
-  PIDTurn(-20,1, a,g,temp);
-  PIDTurn(20,1, a,g,temp);
-  PIDTurn(22.5,0, a,g,temp);
-  PIDTurn(22.5,1, a,g,temp);
-  PIDDrive(125, a,g,temp);
-  PIDTurn(-22.5,0, a,g,temp);
-  PIDDrive(16, a,g,temp);
-  PIDTurn(-22.5,0, a,g,temp);
-  PIDDrive(-50, a,g,temp);
-  
-  
-  while(1){}*/
+  return;
 }
 
-void resetButton(){
-  go = true;
-}
-
-void openClaw(float angle){
+/**
+ * @brief Opens the intake claw to a specified angle
+ *
+ * @param angle the angle (in degrees) to open the claw
+ * @return None
+ */
+void openClaw(float angle)
+{
   intakeServo.write(220 * angle);
-}
-
-void printGyro(){
-  display_handler.clearDisplay();
-  display_handler.setCursor(0,0);
-  display_handler.println("Rotation X:");
-  display_handler.println(x);
-  display_handler.println("Rotation Y:");
-  display_handler.println(y );
-  display_handler.println("Rotation z:");
-  display_handler.println(z);
-  display_handler.display();
-  delay(50);
 }
