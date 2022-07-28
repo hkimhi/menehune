@@ -6,7 +6,7 @@
 #include <Adafruit_Sensor.h>
 
 #define MIN_GYRO 0.01
-#define CONV 37 / 90.0
+#define CONV 45/50 * 45/40
 
 extern Adafruit_SSD1306 display1;
 

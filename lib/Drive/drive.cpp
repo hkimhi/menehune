@@ -91,12 +91,12 @@ void PIDTurn(float setPoint, int dir, sensors_event_t accel, sensors_event_t gyr
     }
     if (dir == 1)
     {
-      driveMotor(LEFT_FOWARD, LEFT_REVERSE, -power);
-      driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, copysign(0.2, power));
+      driveMotor(LEFT_FOWARD, LEFT_REVERSE, -power * LCOMP);
+      driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, copysign(0.2 * LCOMP, power));
     }
     else
     {
-      driveMotor(LEFT_FOWARD, LEFT_REVERSE, copysign(0.2, -power));
+      driveMotor(LEFT_FOWARD, LEFT_REVERSE, copysign(0.2, -power) * LCOMP);
       driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, power);
     }
 
@@ -117,7 +117,7 @@ void PIDTurn(float setPoint, int dir, sensors_event_t accel, sensors_event_t gyr
  */
 void PIDDrive(float dist, sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp)
 {
-  float sat = 0.33;
+  float sat = 0.45;
   float iSat = 100;
   float pTurn = 1;
   int error, prevError, errorSum = 0;
@@ -172,7 +172,7 @@ void PIDDrive(float dist, sensors_event_t accel, sensors_event_t gyro, sensors_e
       turnPower = copysign(power, turnPower);
     }
 
-    driveMotor(LEFT_FOWARD, LEFT_REVERSE, power - turnPower);
+    driveMotor(LEFT_FOWARD, LEFT_REVERSE, (power - turnPower) * LCOMP);
     driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, power + turnPower);
 
     printDrive(power, error, errorSum, prevError, timeout);

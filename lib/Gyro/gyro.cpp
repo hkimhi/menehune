@@ -75,8 +75,11 @@ void printGyro()
 {
   display1.clearDisplay();
   display1.setCursor(0, 0);
-  display1.printf("Rotation X: %i\n", x);
-  display1.printf("Rotation Y: %i\n", y);
-  display1.printf("Rotation Z: %i\n", z);
+  display1.printf("Rotation X:");
+  display1.println(x);
+  display1.printf("Rotation Y:");
+  display1.println(y);
+  display1.printf("Rotation Z:");
+  display1.println(z);
   display1.display();
 }

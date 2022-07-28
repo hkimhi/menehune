@@ -17,11 +17,12 @@
 #define P_TURN 1
 #define I_TURN 0.01
 #define D_TURN 1
-#define P_DRIVE 0.002
+#define P_DRIVE 0.01
 #define I_DRIVE 0.000
 #define D_DRIVE 0.01
 #define FFT 0.22
 #define FFD 0.0
+#define LCOMP 0.25
 
 extern Adafruit_SSD1306 display1;
 
