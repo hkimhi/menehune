@@ -8,9 +8,9 @@
 #define SERVO PA8               // Pin for servo controlling intake claw
 #define BUMPER_SWITCH PB11      // Front bumper for hitting pedestal
 #define HALL_INPUT PB10         // Hall effect sensors to detect magnet
-#define SWITCH_STATES_INPUT PB5 // Digital input to manually change states for testing
 
 // VARIABLES
+#define INTAKE_SERVO_OPEN_POS 0
 extern Servo intakeServo;
 extern bool intakeEnabled; // determines if the intake system is enabled or disabled
 
@@ -19,7 +19,6 @@ void printIntake();
 void onHit();
 void onDetectBomb();
 void startIntake();
-void switchStates();
-void openClaw(float angle);
+void resetClaw();
 
 #endif

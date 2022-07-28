@@ -2,11 +2,9 @@
 #include <Servo.h>
 #include "intake.h"
 
-#define INTAKE_SERVO_OPEN_POS 0
-
 extern Adafruit_SSD1306 display1;
 Servo intakeServo;
-int intakeServoClosedPosition;
+int intakeServoClosedPosition = 120;
 
 bool intakeEnabled = false;
 bool currentlySeesBomb = false;
@@ -58,21 +56,15 @@ void onDetectBomb()
   }
 }
 
-//TODO get rid of this function
 /**
- * @brief Function used during testing to manually switch input states
- * 
+ * @brief Resets the intake claw by moving it to the open position and setting the currentlySeesBomb flag to false
+ *
  * @return None
  */
-void switchStates()
+void resetClaw()
 {
   if (intakeEnabled)
   {
-    intakeEnabled = false;
-  }
-  else if (!intakeEnabled)
-  {
-    intakeEnabled = true;
     intakeServo.write(INTAKE_SERVO_OPEN_POS);
     currentlySeesBomb = false;
   }
