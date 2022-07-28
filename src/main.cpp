@@ -64,6 +64,9 @@ void setup(void)
 
 void loop()
 {
+  readGyro(a, g, temp);
+  printGyro();
+
   PIDDrive(180, a, g, temp);
   PIDTurn(-20, 1, a, g, temp);
   PIDTurn(20, 1, a, g, temp);
@@ -75,5 +78,7 @@ void loop()
   PIDTurn(-22.5, 0, a, g, temp);
   PIDDrive(-50, a, g, temp);
 
-  return;
+  while (1)
+  {
+  }
 }
