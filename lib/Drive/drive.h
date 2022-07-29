@@ -8,7 +8,7 @@
 #include <ir_sensor.h>
 
 // Pin I/O
-#define LEFT_FOWARD PB_1  // Left side drive, forward direction
+#define LEFT_FOWARD PA_7 // Left side drive, forward direction
 #define LEFT_REVERSE PB_0 // Left side drive, reverse direction
 #define RIGHT_FOWARD PB_8  // Right side drive, forward direction
 #define RIGHT_REVERSE PB_9 // Riht side drive, reverse direction
@@ -17,16 +17,15 @@
 #define IR_PIN2 PA_4
 
 // Constants
-#define P_TURN 1
+#define P_TURN 0.5
 #define I_TURN 0.01
 #define D_TURN 1
 #define P_DRIVE 0.01
 #define I_DRIVE 0.000
 #define D_DRIVE 0.01
 #define FFT 0.22
-#define FFD 0.0
-#define LCOMP 0.25
-
+#define FFD 0.02
+#define LCOMP 1
 extern volatile float counter;
 
 void driveMotor(PinName fowardPin, PinName reversePin, float power);

@@ -38,6 +38,7 @@ void setup(void)
   pinMode(HALL_INPUT, INPUT_PULLUP);
   intakeServo.attach(SERVO);
   intakeServo.write(INTAKE_SERVO_OPEN_POS);
+  // intakeServo.write(intakeServoClosedPosition);
   display1.begin(SSD1306_SWITCHCAPVCC, 0x3C);
 
   attachInterrupt(digitalPinToInterrupt(BUMPER_SWITCH), onHit, FALLING);     // SWITCH_INPUT is regular high (Switches in parallel with internal pull-up)
@@ -59,50 +60,27 @@ void setup(void)
 
   intakeEnabled = true;
 }
-int i = 0;
 void loop()
 {
-<<<<<<< Updated upstream
-  printIntake();
-  if (hasSeenBomb)
-=======
-
-  readGyro(a, g, temp);
-  printGyro();
-
-  PIDDrive(1800, false, a, g, temp);
+  intakeServo.write(intakeServoClosedPosition);
+  
+  PIDDrive(180, false, a, g, temp);
   PIDTurn(-20, 1, a, g, temp);
+  resetIntake();
+  PIDDrive(30, false, a, g, temp);
   PIDTurn(20, 1, a, g, temp);
   PIDTurn(22.5, 0, a, g, temp);
   PIDTurn(22.5, 1, a, g, temp);
   PIDDrive(125, false, a, g, temp);
   PIDTurn(-22.5, 0, a, g, temp);
-  PIDDrive(16, false, a, g, temp);
+  resetIntake();
+  PIDDrive(30, false, a, g, temp);
   PIDTurn(-22.5, 0, a, g, temp);
   PIDDrive(-50, false, a, g, temp);
-
+  
   while (1)
->>>>>>> Stashed changes
   {
     delay(5000);
     resetIntake();
   }
-
-  // readGyro(a, g, temp);
-  // printGyro();
-
-  // PIDDrive(180, a, g, temp);
-  // PIDTurn(-20, 1, a, g, temp);
-  // PIDTurn(20, 1, a, g, temp);
-  // PIDTurn(22.5, 0, a, g, temp);
-  // PIDTurn(22.5, 1, a, g, temp);
-  // PIDDrive(125, a, g, temp);
-  // PIDTurn(-22.5, 0, a, g, temp);
-  // PIDDrive(16, a, g, temp);
-  // PIDTurn(-22.5, 0, a, g, temp);
-  // PIDDrive(-50, a, g, temp);
-
-  // while (1)
-  // {
-  // }
 }

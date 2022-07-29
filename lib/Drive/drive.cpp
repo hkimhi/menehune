@@ -29,12 +29,12 @@ void driveMotor(PinName fowardPin, PinName reversePin, float power)
   if (power > 0)
   {
     pwm_start(reversePin, 100, 0, TimerCompareFormat_t::RESOLUTION_16B_COMPARE_FORMAT);
-    pwm_start(fowardPin, 100, (int)(32768 * power * 2), TimerCompareFormat_t::RESOLUTION_16B_COMPARE_FORMAT);
+    pwm_start(fowardPin, 100, (int)(32768 * power), TimerCompareFormat_t::RESOLUTION_16B_COMPARE_FORMAT);
   }
   else if (power < 0)
   {
     pwm_start(fowardPin, 100, 0, TimerCompareFormat_t::RESOLUTION_16B_COMPARE_FORMAT);
-    pwm_start(reversePin, 100, (int)(32768 * abs(power) * 2), TimerCompareFormat_t::RESOLUTION_16B_COMPARE_FORMAT);
+    pwm_start(reversePin, 100, (int)(32768 * abs(power)), TimerCompareFormat_t::RESOLUTION_16B_COMPARE_FORMAT);
   }
   else
   {
@@ -55,7 +55,7 @@ void driveMotor(PinName fowardPin, PinName reversePin, float power)
  */
 void PIDTurn(float setPoint, int dir, sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp)
 {
-  float sat = 0.5;
+  float sat = 0.55;
   float iSat = 100;
   float error, prevError, errorSum = 0;
   float power;
@@ -94,11 +94,11 @@ void PIDTurn(float setPoint, int dir, sensors_event_t accel, sensors_event_t gyr
     if (dir == 1)
     {
       driveMotor(LEFT_FOWARD, LEFT_REVERSE, -power * LCOMP);
-      driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, copysign(0.2 * LCOMP, power));
+      driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, copysign(0.20 * LCOMP, power));
     }
     else
     {
-      driveMotor(LEFT_FOWARD, LEFT_REVERSE, copysign(0.2, -power) * LCOMP);
+      driveMotor(LEFT_FOWARD, LEFT_REVERSE, copysign(0.20, -power) * LCOMP);
       driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, power);
     }
 
@@ -119,9 +119,9 @@ void PIDTurn(float setPoint, int dir, sensors_event_t accel, sensors_event_t gyr
  */
 void PIDDrive(float dist, bool useIR, sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp)
 {
-  float sat = 0.35;
+  float sat = 0.34;
   float iSat = 100;
-  float pTurn = 0.5;
+  float pTurn = 0.1;
   float pIR = 10;
   int error, prevError, errorSum = 0;
   float turnError, turnSet;
