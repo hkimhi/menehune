@@ -28,18 +28,18 @@ void driveMotor(PinName fowardPin, PinName reversePin, float power)
 {
   if (power > 0)
   {
-    pwm_start(reversePin, 200, 0, TimerCompareFormat_t::RESOLUTION_16B_COMPARE_FORMAT);
-    pwm_start(fowardPin, 200, (int)(32768 * power), TimerCompareFormat_t::RESOLUTION_16B_COMPARE_FORMAT);
+    pwm_start(reversePin, 100, 0, TimerCompareFormat_t::RESOLUTION_16B_COMPARE_FORMAT);
+    pwm_start(fowardPin, 100, (int)(32768 * power * 2), TimerCompareFormat_t::RESOLUTION_16B_COMPARE_FORMAT);
   }
   else if (power < 0)
   {
-    pwm_start(fowardPin, 200, 0, TimerCompareFormat_t::RESOLUTION_16B_COMPARE_FORMAT);
-    pwm_start(reversePin, 200, (int)(32768 * abs(power)), TimerCompareFormat_t::RESOLUTION_16B_COMPARE_FORMAT);
+    pwm_start(fowardPin, 100, 0, TimerCompareFormat_t::RESOLUTION_16B_COMPARE_FORMAT);
+    pwm_start(reversePin, 100, (int)(32768 * abs(power) * 2), TimerCompareFormat_t::RESOLUTION_16B_COMPARE_FORMAT);
   }
   else
   {
-    pwm_start(reversePin, 200, 0, TimerCompareFormat_t::RESOLUTION_16B_COMPARE_FORMAT);
-    pwm_start(fowardPin, 200, 0, TimerCompareFormat_t::RESOLUTION_16B_COMPARE_FORMAT);
+    pwm_start(reversePin, 100, 0, TimerCompareFormat_t::RESOLUTION_16B_COMPARE_FORMAT);
+    pwm_start(fowardPin, 100, 0, TimerCompareFormat_t::RESOLUTION_16B_COMPARE_FORMAT);
   }
 }
 
@@ -55,7 +55,7 @@ void driveMotor(PinName fowardPin, PinName reversePin, float power)
  */
 void PIDTurn(float setPoint, int dir, sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp)
 {
-  float sat = 0.7;
+  float sat = 0.5;
   float iSat = 100;
   float error, prevError, errorSum = 0;
   float power;
@@ -117,11 +117,12 @@ void PIDTurn(float setPoint, int dir, sensors_event_t accel, sensors_event_t gyr
  * @param temp temperature sensor event
  * @return None
  */
-void PIDDrive(float dist, sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp)
+void PIDDrive(float dist, bool useIR, sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp)
 {
-  float sat = 0.45;
+  float sat = 0.35;
   float iSat = 100;
-  float pTurn = 1;
+  float pTurn = 0.5;
+  float pIR = 10;
   int error, prevError, errorSum = 0;
   float turnError, turnSet;
   float power, turnPower;
@@ -168,7 +169,12 @@ void PIDDrive(float dist, sensors_event_t accel, sensors_event_t gyro, sensors_e
     }
     prevError = error;
     delay(50);
-    turnPower = (turnError * pTurn);
+    if(!useIR){
+       turnPower = (turnError * pTurn);
+    }
+    else{
+      turnPower = (goertzel(IR_PIN1, 10, 4) - goertzel(IR_PIN2, 10, 4)) * pIR;
+    }
     if (abs(turnPower) > abs(power))
     {
       turnPower = copysign(power, turnPower);

@@ -59,11 +59,30 @@ void setup(void)
 
   intakeEnabled = true;
 }
-
+int i = 0;
 void loop()
 {
+<<<<<<< Updated upstream
   printIntake();
   if (hasSeenBomb)
+=======
+
+  readGyro(a, g, temp);
+  printGyro();
+
+  PIDDrive(1800, false, a, g, temp);
+  PIDTurn(-20, 1, a, g, temp);
+  PIDTurn(20, 1, a, g, temp);
+  PIDTurn(22.5, 0, a, g, temp);
+  PIDTurn(22.5, 1, a, g, temp);
+  PIDDrive(125, false, a, g, temp);
+  PIDTurn(-22.5, 0, a, g, temp);
+  PIDDrive(16, false, a, g, temp);
+  PIDTurn(-22.5, 0, a, g, temp);
+  PIDDrive(-50, false, a, g, temp);
+
+  while (1)
+>>>>>>> Stashed changes
   {
     delay(5000);
     resetIntake();

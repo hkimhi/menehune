@@ -5,13 +5,16 @@
 #include <Adafruit_SSD1306.h>
 #include <Adafruit_Sensor.h>
 #include <gyro.h>
+#include <ir_sensor.h>
 
 // Pin I/O
-#define LEFT_FOWARD PB_10  // Left side drive, forward direction
-#define LEFT_REVERSE PB_11 // Left side drive, reverse direction
+#define LEFT_FOWARD PB_1  // Left side drive, forward direction
+#define LEFT_REVERSE PB_0 // Left side drive, reverse direction
 #define RIGHT_FOWARD PB_8  // Right side drive, forward direction
 #define RIGHT_REVERSE PB_9 // Riht side drive, reverse direction
 #define ENC_PIN PB12       // Motor encoder
+#define IR_PIN1 PA_5
+#define IR_PIN2 PA_4
 
 // Constants
 #define P_TURN 1
@@ -24,9 +27,11 @@
 #define FFD 0.0
 #define LCOMP 0.25
 
+extern volatile float counter;
+
 void driveMotor(PinName fowardPin, PinName reversePin, float power);
 void PIDTurn(float setPoint, int dir, sensors_event_t a, sensors_event_t g, sensors_event_t temp);
-void PIDDrive(float setPoint, sensors_event_t a, sensors_event_t g, sensors_event_t temp);
+void PIDDrive(float setPoint, bool useIR, sensors_event_t a, sensors_event_t g, sensors_event_t temp);
 void encCount();
 void driveSetup();
 void printDrive(float power, int error, int errorSum, int prevError);
