@@ -4,7 +4,6 @@
 extern Adafruit_SSD1306 display1;
 
 volatile float counter = 0;
-volatile int dir = 1;
 bool drive = false;
 
 /**
@@ -12,7 +11,8 @@ bool drive = false;
  *
  */
 void driveSetup()
-{
+{ 
+  pinMode(ENC_PIN2, INPUT);
   attachInterrupt(digitalPinToInterrupt(ENC_PIN), encCount, CHANGE);
 }
 
@@ -55,7 +55,7 @@ void driveMotor(PinName fowardPin, PinName reversePin, float power)
  */
 void PIDTurn(float setPoint, int dir, sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp)
 {
-  float sat = 0.55;
+  float sat = 0.6;
   float iSat = 100;
   float error, prevError, errorSum = 0;
   float power;
@@ -79,14 +79,7 @@ void PIDTurn(float setPoint, int dir, sensors_event_t accel, sensors_event_t gyr
     errorSum += error;
     // Save Prev values for derivative
     prevError = error;
-    if ((power) > sat)
-    {
-      power = sat;
-    }
-    else if (power < -sat)
-    {
-      power = -sat;
-    }
+    clip(power, -sat, sat);
     if (abs(error + prevError) / 2 < 0.6)
     {
       gyCo++;
@@ -149,15 +142,11 @@ void PIDDrive(float dist, float sat, bool useIR, sensors_event_t accel, sensors_
     // integrate Errors
     errorSum += error;
     // Save Prev values for derivative
-    if (error <= 0)
-      dir = -1;
-    else if (error > 0)
-      dir = 1;
+  
     power += copysign(FFD, error);
-    if ((power) > sat)
-      power = sat;
-    else if (power < -sat)
-      power = -sat;
+
+    clip(power, -sat, sat);
+
     if (abs(error + prevError) <= 2)
     {
       drive = false;
@@ -168,23 +157,25 @@ void PIDDrive(float dist, float sat, bool useIR, sensors_event_t accel, sensors_
     }
     prevError = error;
     delay(50);
+
+    //Calculate Angle Correction Error
     if(!useIR){
        turnPower = (turnError * pTurn);
     }
     else{
       turnPower = (goertzel(IR_PIN1, 10, 4) - goertzel(IR_PIN2, 10, 4)) * pIR;
     }
-    if (abs(turnPower) > abs(power))
-    {
-      turnPower = copysign(power, turnPower);
-    }
 
+    //Clip Turnpower to Power to prevent robot from going backwards
+    turnPower = clip(turnPower, -abs(power), abs(power));
+
+    //Apply power to motors
     driveMotor(LEFT_FOWARD, LEFT_REVERSE, (power - turnPower) * LCOMP);
     driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, power + turnPower);
 
     printDrive(power, error, errorSum, prevError, timeout);
   }
-
+  //Stop Motors after Reaching destination
   driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0);
   driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0);
 }
@@ -198,7 +189,12 @@ void PIDDrive(float dist, float sat, bool useIR, sensors_event_t accel, sensors_
  */
 void encCount()
 {
-  counter += dir;
+  if((digitalRead(ENC_PIN) && digitalRead(ENC_PIN2)) || (!digitalRead(ENC_PIN) && !digitalRead(ENC_PIN2))){
+    counter++;
+  }
+  else if ((digitalRead(ENC_PIN) && !digitalRead(ENC_PIN2)) || (!digitalRead(ENC_PIN) && digitalRead(ENC_PIN2))){
+    counter--;
+  }
 }
 
 /**
@@ -225,10 +221,41 @@ void printDrive(float power, int error, int errorSum, int prevError, int timeout
 {
   display1.clearDisplay();
   display1.setCursor(0, 0);
-  // display1.printf("Power: %f\n", power);
   display1.print("Power: ");
   display1.println(power);
   display1.printf("Error:\n  %i\n  %i\n  %i\n", error, errorSum, error - prevError);
   display1.printf("Timeout: %i\n", timeout);
   display1.display();
+}
+
+/**
+ * @brief Clips a value between a given low and high value
+ * 
+ * @param in value to be clipped
+ * @param low low value for it to be clipped to
+ * @param high high value for it to be clipped to 
+ * 
+ * @return the value of min clamped between the low and high bounds
+ * 
+ */
+float clip(float in, float low, float high){
+  return min(max(in, low), high);
+}
+
+void irTurn(float sat){
+  int irCount = 0;
+  float power, error;
+  int threshold = 0.01;
+  while(irCount < 10){
+    error = goertzel(IR_PIN1, 10, 4) - goertzel(IR_PIN2, 10, 4);
+    power = error * PTURNIR;
+    clip(power, -sat, sat);
+    driveMotor(LEFT_FOWARD, LEFT_REVERSE, -power);
+    driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, power);
+    if(error < threshold){
+      irCount++;
+    }
+  }
+  driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0);
+  driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0);
 }

@@ -88,11 +88,11 @@ void loop()
     display1.setTextColor(SSD1306_WHITE);
     display1.setCursor(0, 0);
     display1.println("Sensor 1");
-    display1.println(goertzel(IR_PIN1, 10, 4) );
+    display1.println(goertzel(IR_PIN1, 10, 4) * 100);
     display1.println("Sensor 2");
-    display1.println(goertzel(IR_PIN2, 10, 4) );
+    display1.println(goertzel(IR_PIN2, 10, 4) * 100);
     display1.println("Ir Feedback");
-    display1.println(goertzel(IR_PIN2, 10, 4)  - goertzel(IR_PIN1, 10, 4));
+    display1.println(goertzel(IR_PIN2, 10, 4)  - goertzel(IR_PIN1, 10, 4) * 100);
     display1.display();
   }
   
