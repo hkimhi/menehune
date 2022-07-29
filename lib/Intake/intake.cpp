@@ -69,3 +69,11 @@ void resetClaw()
     currentlySeesBomb = false;
   }
 }
+
+void resetIntake()
+{
+  intakeEnabled = true;
+  intakeServo.write(INTAKE_SERVO_OPEN_POS);
+  currentlySeesBomb = false;
+  hasSeenBomb = false;
+}

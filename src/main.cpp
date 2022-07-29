@@ -56,25 +56,34 @@ void setup(void)
   display1.display();
 
   delay(100);
+
+  intakeEnabled = true;
 }
 
 void loop()
 {
-  readGyro(a, g, temp);
-  printGyro();
-
-  PIDDrive(180, a, g, temp);
-  PIDTurn(-20, 1, a, g, temp);
-  PIDTurn(20, 1, a, g, temp);
-  PIDTurn(22.5, 0, a, g, temp);
-  PIDTurn(22.5, 1, a, g, temp);
-  PIDDrive(125, a, g, temp);
-  PIDTurn(-22.5, 0, a, g, temp);
-  PIDDrive(16, a, g, temp);
-  PIDTurn(-22.5, 0, a, g, temp);
-  PIDDrive(-50, a, g, temp);
-
-  while (1)
+  printIntake();
+  if (hasSeenBomb)
   {
+    delay(5000);
+    resetIntake();
   }
+
+  // readGyro(a, g, temp);
+  // printGyro();
+
+  // PIDDrive(180, a, g, temp);
+  // PIDTurn(-20, 1, a, g, temp);
+  // PIDTurn(20, 1, a, g, temp);
+  // PIDTurn(22.5, 0, a, g, temp);
+  // PIDTurn(22.5, 1, a, g, temp);
+  // PIDDrive(125, a, g, temp);
+  // PIDTurn(-22.5, 0, a, g, temp);
+  // PIDDrive(16, a, g, temp);
+  // PIDTurn(-22.5, 0, a, g, temp);
+  // PIDDrive(-50, a, g, temp);
+
+  // while (1)
+  // {
+  // }
 }
