@@ -117,9 +117,8 @@ void PIDTurn(float setPoint, int dir, sensors_event_t accel, sensors_event_t gyr
  * @param temp temperature sensor event
  * @return None
  */
-void PIDDrive(float dist, bool useIR, sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp)
+void PIDDrive(float dist, float sat, bool useIR, sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp)
 {
-  float sat = 0.34;
   float iSat = 100;
   float pTurn = 0.1;
   float pIR = 10;

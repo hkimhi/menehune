@@ -58,31 +58,33 @@ void setup(void)
 
   delay(100);
 
-  intakeEnabled = true;
 }
 void loop()
 {
-  intakeServo.write(intakeServoClosedPosition);
-  //intakeOff();
+  
+
   printIntake();
-  PIDDrive(180, false, a, g, temp);
-  PIDTurn(-20, 1, a, g, temp);
   resetIntake();
-  PIDDrive(30, false, a, g, temp);
-  PIDTurn(20, 1, a, g, temp);
+
+  PIDDrive(170, 0.34, false, a, g, temp);
+  intakeEnabled = true;
+  PIDTurn(-15, 1, a, g, temp); //first pedestal
+  PIDDrive(30, 0.28, false, a, g, temp);
+  PIDTurn(15, 1, a, g, temp);
   //intakeOff();
   PIDTurn(22.5, 0, a, g, temp);
   PIDTurn(22.5, 1, a, g, temp);
-  PIDDrive(125, false, a, g, temp);
+  PIDDrive(115, 0.28, false, a, g, temp);
   PIDTurn(-22.5, 0, a, g, temp);
   resetIntake();
-  PIDDrive(30, false, a, g, temp);
+  PIDDrive(30, 0.28, false, a, g, temp);
   PIDTurn(-22.5, 0, a, g, temp);
-  PIDDrive(-50, false, a, g, temp);
+  PIDDrive(-50, 0.34, false, a, g, temp);
   
   while (1)
   {
     delay(5000);
     resetIntake();
   }
+  
 }

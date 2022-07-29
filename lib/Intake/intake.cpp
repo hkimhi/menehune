@@ -4,7 +4,7 @@
 
 extern Adafruit_SSD1306 display1;
 Servo intakeServo;
-int intakeServoClosedPosition = 120;
+int intakeServoClosedPosition = 140;
 
 bool intakeEnabled = false;
 bool currentlySeesBomb = false;
