@@ -63,12 +63,14 @@ void setup(void)
 void loop()
 {
   intakeServo.write(intakeServoClosedPosition);
-  
+  //intakeOff();
+  printIntake();
   PIDDrive(180, false, a, g, temp);
   PIDTurn(-20, 1, a, g, temp);
   resetIntake();
   PIDDrive(30, false, a, g, temp);
   PIDTurn(20, 1, a, g, temp);
+  //intakeOff();
   PIDTurn(22.5, 0, a, g, temp);
   PIDTurn(22.5, 1, a, g, temp);
   PIDDrive(125, false, a, g, temp);

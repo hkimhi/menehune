@@ -22,5 +22,6 @@ void onDetectBomb();
 void startIntake();
 void resetClaw();
 void resetIntake();
+void intakeOff();
 
 #endif
