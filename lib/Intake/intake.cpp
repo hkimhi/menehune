@@ -70,32 +70,3 @@ void resetClaw()
     currentlySeesBomb = false;
   }
 }
-
-
-/**
- * @brief Resets the intake system by enabling intake , opening the claw, setting currentlySeesBomb to false and setting hasSeenBomb to false
- * 
- * @return None
- */
-void resetIntake()
-{
-  intakeEnabled = true;
-  intakeServo.write(INTAKE_SERVO_OPEN_POS);
-  currentlySeesBomb = false;
-  hasSeenBomb = false;
-  printIntake();
-}
-
-
-/**
- * @brief Turns intake system off by 
- */
-
-void intakeOff()
-{
-  intakeEnabled = false;
-  intakeServo.write(intakeServoClosedPosition);
-  currentlySeesBomb = false;
-  hasSeenBomb = false;
-  printIntake();
-}

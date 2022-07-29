@@ -19,9 +19,6 @@ extern bool hasSeenBomb;
 void printIntake();
 void onHit();
 void onDetectBomb();
-void startIntake();
 void resetClaw();
-void resetIntake();
-void intakeOff();
 
 #endif
