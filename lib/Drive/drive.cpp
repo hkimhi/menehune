@@ -4,6 +4,7 @@
 extern Adafruit_SSD1306 display1;
 
 volatile float counter = 0;
+volatile int ij = 0;
 bool drive = false;
 
 /**
@@ -13,6 +14,8 @@ bool drive = false;
 void driveSetup()
 { 
   pinMode(ENC_PIN2, INPUT);
+  pinMode(IR_PIN1, INPUT_ANALOG);
+  pinMode(IR_PIN2, INPUT_ANALOG);
   attachInterrupt(digitalPinToInterrupt(ENC_PIN), encCount, CHANGE);
 }
 
@@ -195,6 +198,7 @@ void encCount()
   else if ((digitalRead(ENC_PIN) && !digitalRead(ENC_PIN2)) || (!digitalRead(ENC_PIN) && digitalRead(ENC_PIN2))){
     counter--;
   }
+  ij++;
 }
 
 /**

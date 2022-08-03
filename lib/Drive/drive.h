@@ -14,8 +14,8 @@
 #define RIGHT_REVERSE PB_9 // Riht side drive, reverse direction
 #define ENC_PIN PB12       // Motor encoder
 #define ENC_PIN2 PB13
-#define IR_PIN1 PB_10
-#define IR_PIN2 PB_11
+#define IR_PIN1 PA_1
+#define IR_PIN2 PA_0
 
 // Constants
 #define P_TURN 0.5
@@ -29,6 +29,7 @@
 #define LCOMP 1
 #define PTURNIR 1
 extern volatile float counter;
+extern volatile int ij;
 
 void driveMotor(PinName fowardPin, PinName reversePin, float power);
 void PIDTurn(float setPoint, int dir, sensors_event_t a, sensors_event_t g, sensors_event_t temp);

@@ -38,12 +38,10 @@ void setup(void)
   pinMode(HALL_INPUT, INPUT_PULLUP);
   intakeServo.attach(SERVO);
   intakeServo.write(INTAKE_SERVO_OPEN_POS);
-  // intakeServo.write(intakeServoClosedPosition);
+  // intakeServo.write(intakeServoClosedPosition);*/
   display1.begin(SSD1306_SWITCHCAPVCC, 0x3C);
-
   attachInterrupt(digitalPinToInterrupt(BUMPER_SWITCH), onHit, FALLING);     // SWITCH_INPUT is regular high (Switches in parallel with internal pull-up)
   attachInterrupt(digitalPinToInterrupt(HALL_INPUT), onDetectBomb, FALLING); // HALL_INPUT is regular high
-
   calibrateGyro(a, g, temp);
   digitalWrite(LED_BUILTIN, HIGH);
   driveSetup();
@@ -87,13 +85,14 @@ void loop()
     display1.setTextSize(1);
     display1.setTextColor(SSD1306_WHITE);
     display1.setCursor(0, 0);
-    display1.println("Sensor 1");
-    display1.println(goertzel(IR_PIN1, 10, 4) * 100);
-    display1.println("Sensor 2");
-    display1.println(goertzel(IR_PIN2, 10, 4) * 100);
-    display1.println("Ir Feedback");
-    display1.println(goertzel(IR_PIN2, 10, 4)  - goertzel(IR_PIN1, 10, 4) * 100);
+    float start = millis();
+    for(int i = 0; i < 1000; i++){
+      analogRead(PA0);
+    }
+    display1.println(goertzel(IR_PIN1, 10, 4));
+    display1.println("Encoder");
+    display1.println(counter);
+    display1.println(ij);
     display1.display();
   }
-  
 }
