@@ -1,26 +1,28 @@
 #include "menu.h"
 
-// Constructors
-Item::Item(String name, vector<Option> options)
+Item::Item(String name, std::vector<Option> options)
 {
     this->name = name;
     this->options = options;
 }
 
-Option::Option(String name, int val)
+Option::Option(String name, int val, int maxVal)
 {
     this->name = name;
-    mapData[0] = val;
+    this->val = val;
+    this->maxVal = maxVal;
 }
 
-// Variables
-vector<Option> reflectOptions{Option("cliff ref", 1200), Option("line ref", 1200)};
-vector<Option> options2 {Option("cliff ref", 100)};
+std::vector<Option> reflectanceOptions{Option("cliff ref", 150, 600), Option("line ref", 1200, 3300)};
+std::vector<Option> driveOptions{};
+std::vector<Option> gyroOptions{};
+std::vector<Option> intakeOptions{Option("closed position", 180, 180)};
 
-const Item items[NUM_MENU_ITEMS] = {
-    Item("Reflect", reflectOptions),
-    Item("Encoders", options2),
-    Item("Gyro", vector<Option>()),
+Item items[NUM_MENU_ITEMS] = {
+    Item("Reflect", reflectanceOptions),
+    Item("Drive", driveOptions),
+    Item("Gyro", gyroOptions),
+    Item("Intake", intakeOptions),
 };
 
 int selectedItem = 0;
@@ -28,7 +30,7 @@ int selectedOption = 0;
 int enteredItem = -1;
 
 // Function declarations
-void enterItem(Adafruit_SSD1306, Item);
+void enterItem(Adafruit_SSD1306 display, Item &item);
 
 // Function Definitions
 void displayMenu(Adafruit_SSD1306 display)
@@ -126,7 +128,7 @@ void displayInfoScreen(Adafruit_SSD1306 display)
     display.display();
 }
 
-void enterItem(Adafruit_SSD1306 display, Item item)
+void enterItem(Adafruit_SSD1306 display, Item &item)
 {
     display.clearDisplay();
     display.setCursor(0, 0);
@@ -144,7 +146,7 @@ void enterItem(Adafruit_SSD1306 display, Item item)
             display.setTextColor(SSD1306_BLACK, SSD1306_WHITE);
             display.print(item.options[i].name);
             display.print(": ");
-            display.println(pot_val);
+            display.println(map(pot_val, 0, 3300, 0, item.options[i].maxVal));
             // display.printf("%s: %i\n", item.options[i].name, pot_val);
         }
         else
@@ -152,8 +154,7 @@ void enterItem(Adafruit_SSD1306 display, Item item)
             display.setTextColor(SSD1306_WHITE);
             display.print(item.options[i].name);
             display.print(": ");
-            display.println(item.options[i].getVal());
-            // display.println(item.options[i].value);
+            display.println(item.options[i].val);
             // display.printf("%s: %i\n", item.options[i].name, item.options[i].value);
         }
     }
@@ -161,7 +162,6 @@ void enterItem(Adafruit_SSD1306 display, Item item)
     if (!digitalRead(JOYSTICK_SWITCH))
     {
         // button pressed --> save value
-        item.options[selectedOption].setVal(pot_val);
-        display.printf("saved val: %i\n", item.options[selectedOption].getVal());
+        item.options[selectedOption].val = map(pot_val, 0, 3300, 0, item.options[selectedOption].maxVal);
     }
 }

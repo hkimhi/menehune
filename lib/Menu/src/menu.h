@@ -4,12 +4,11 @@
 #include <Adafruit_SSD1306.h>
 #include <WString.h>
 #include <vector>
-using namespace std;
 
 // Pin I/O
-#define JOYSTICK_SWITCH PC13
-#define JOYSTICK_X PA2
-#define JOYSTICK_Y PA3
+#define JOYSTICK_SWITCH PC15
+#define JOYSTICK_Y PA2
+#define JOYSTICK_X PA3
 #define INPUT_POT PA4
 
 // Constants
@@ -17,7 +16,8 @@ using namespace std;
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
 #define OLED_RESET -1    // This display does not have a reset pin accessible
 
-#define NUM_MENU_ITEMS 3
+#define NUM_MENU_ITEMS 4
+#define NUM_MAX_OPTIONS 4
 
 // Function Declarations
 void displayInfoScreen(Adafruit_SSD1306 display);
@@ -25,24 +25,21 @@ void displayMenu(Adafruit_SSD1306 display);
 
 class Option
 {
-private:
-  vector<int> mapData;
-
 public:
-  Option(String name, int val);
-  void setVal(int val) { mapData[0] = val; }
-  int getVal() { return mapData[0]; }
+    Option(String name, int val, int maxVal);
 
-  String name;
+    String name;
+    int val;
+    int maxVal;
 };
 
 class Item
 {
 public:
-  Item(String name, vector<Option> options);
+    Item(String name, std::vector<Option> options);
 
-  String name;
-  vector<Option> options;
+    String name;
+    std::vector<Option> options;
 };
 
 #endif
