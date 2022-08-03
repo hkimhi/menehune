@@ -70,3 +70,8 @@ void resetClaw()
     currentlySeesBomb = false;
   }
 }
+
+void setClosedPosition(int closedPosition)
+{
+  intakeServoClosedPosition = closedPosition;
+}

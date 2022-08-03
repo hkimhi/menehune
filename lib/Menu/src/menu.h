@@ -26,11 +26,12 @@ void displayMenu(Adafruit_SSD1306 display);
 class Option
 {
 public:
-    Option(String name, int val, int maxVal);
+    Option(String name, int val, int maxVal, void (*func)(int));
 
     String name;
     int val;
     int maxVal;
+    void (*func)(int);
 };
 
 class Item

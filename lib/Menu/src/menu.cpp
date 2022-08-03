@@ -1,4 +1,6 @@
 #include "menu.h"
+#include "reflectance.h"
+#include "intake.h"
 
 Item::Item(String name, std::vector<Option> options)
 {
@@ -6,17 +8,18 @@ Item::Item(String name, std::vector<Option> options)
     this->options = options;
 }
 
-Option::Option(String name, int val, int maxVal)
+Option::Option(String name, int val, int maxVal, void (*func)(int))
 {
     this->name = name;
     this->val = val;
     this->maxVal = maxVal;
+    this->func = func;
 }
 
-std::vector<Option> reflectanceOptions{Option("cliff ref", 150, 600), Option("line ref", 1200, 3300)};
+std::vector<Option> reflectanceOptions{Option("cliff ref", 150, 600, setReflectanceOneReference), Option("line ref", 1200, 3300, setReflectanceTwoReference)};
 std::vector<Option> driveOptions{};
 std::vector<Option> gyroOptions{};
-std::vector<Option> intakeOptions{Option("closed position", 180, 180)};
+std::vector<Option> intakeOptions{Option("closed position", 180, 180, setClosedPosition)};
 
 Item items[NUM_MENU_ITEMS] = {
     Item("Reflect", reflectanceOptions),
@@ -163,5 +166,6 @@ void enterItem(Adafruit_SSD1306 display, Item &item)
     {
         // button pressed --> save value
         item.options[selectedOption].val = map(pot_val, 0, 3300, 0, item.options[selectedOption].maxVal);
+        item.options[selectedOption].func(item.options[selectedOption].val);
     }
 }

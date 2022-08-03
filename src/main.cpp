@@ -10,6 +10,7 @@
 #include "ir_sensor.h"
 #include "intake.h"
 #include "menu.h"
+#include "reflectance.h"
 
 // PIN I/O //
 #undef LED_BUILTIN
@@ -40,6 +41,15 @@ void setup(void)
   pinMode(JOYSTICK_Y, INPUT);
   pinMode(JOYSTICK_SWITCH, INPUT);
   pinMode(INPUT_POT, INPUT);
+
+  pinMode(REFLECTANCE_ONE, INPUT_PULLUP);
+  pinMode(REFLECTANCE_TWO, INPUT_PULLUP);
+  pinMode(REFLECTANCE_THREE, INPUT_PULLUP);
+  pinMode(REFLECTANCE_FOUR, INPUT_PULLUP);
+  pinMode(REFLECTANCE_FIVE, INPUT_PULLUP);
+  pinMode(REFLECTANCE_SIX, INPUT_PULLUP);
+  setReflectanceOneReference(1500);
+  setReflectanceTwoReference(150);
 
   pinMode(SERVO_POS_POT, INPUT_ANALOG);
   pinMode(BUMPER_SWITCH, INPUT_PULLUP);
@@ -78,8 +88,6 @@ void loop()
 {
   displayInfoScreen(display1);
   displayMenu(display2);
-
-  // intakeServo.write(intakeServoClosedPosition);
   // //intakeOff();
   // printIntake();
   // PIDDrive(180, false, a, g, temp);
@@ -96,7 +104,7 @@ void loop()
   // PIDDrive(30, false, a, g, temp);
   // PIDTurn(-22.5, 0, a, g, temp);
   // PIDDrive(-50, false, a, g, temp);
-  
+
   // while (1)
   // {
   //   delay(5000);
