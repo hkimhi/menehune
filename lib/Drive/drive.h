@@ -32,8 +32,13 @@ extern volatile float counter;
 extern volatile int ij;
 
 void driveMotor(PinName fowardPin, PinName reversePin, float power);
+<<<<<<< HEAD
 void PIDTurn(float setPoint, int dir, sensors_event_t a, sensors_event_t g, sensors_event_t temp);
 void PIDDrive(float setPoint, float sat, bool useIR, sensors_event_t a, sensors_event_t g, sensors_event_t temp);
+=======
+void PIDTurn(float setPoint, int dir, sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp);
+void PIDDrive(float dist, bool useIR, sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp);
+>>>>>>> 48df4d8084bafc17d556d843b4d486a310ebb393
 void encCount();
 void driveSetup();
 void printDrive(float power, int error, int errorSum, int prevError);
