@@ -82,7 +82,7 @@ void PIDTurn(float setPoint, int dir, sensors_event_t accel, sensors_event_t gyr
     errorSum += error;
     // Save Prev values for derivative
     prevError = error;
-    clip(power, -sat, sat);
+    power = clip(power, -sat, sat);
     if (abs(error + prevError) / 2 < 0.6)
     {
       gyCo++;
@@ -117,7 +117,7 @@ void PIDDrive(float dist, float sat, bool useIR, sensors_event_t accel, sensors_
 {
   float iSat = 100;
   float pTurn = 0.1;
-  float pIR = 10;
+  float pIR = -25;
   int error, prevError, errorSum = 0;
   float turnError, turnSet;
   float power, turnPower;
@@ -127,7 +127,9 @@ void PIDDrive(float dist, float sat, bool useIR, sensors_event_t accel, sensors_
   float setPoint = (dist / (6.28 * 3.5)) * 48;
   readGyro(accel, gyro, temp);
   turnSet = z;
-  while (drive && (timeout < 10))
+  driveMotor(LEFT_FOWARD, LEFT_REVERSE, copysign(sat, dist));
+  driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, copysign(sat, dist));
+  while ((timeout < 10))
   {
 
     readGyro(accel, gyro, temp);
@@ -148,13 +150,9 @@ void PIDDrive(float dist, float sat, bool useIR, sensors_event_t accel, sensors_
   
     power += copysign(FFD, error);
 
-    clip(power, -sat, sat);
+    power = clip(power, -sat, sat);
 
-    if (abs(error + prevError) <= 2)
-    {
-      drive = false;
-    }
-    if (prevError == error)
+    if ((prevError == error) || abs(error + prevError) <= 2)
     {
       timeout++;
     }
@@ -198,7 +196,6 @@ void encCount()
   else if ((digitalRead(ENC_PIN) && !digitalRead(ENC_PIN2)) || (!digitalRead(ENC_PIN) && digitalRead(ENC_PIN2))){
     counter--;
   }
-  ij++;
 }
 
 /**
@@ -243,7 +240,13 @@ void printDrive(float power, int error, int errorSum, int prevError, int timeout
  * 
  */
 float clip(float in, float low, float high){
-  return min(max(in, low), high);
+  if(in < low){
+    return low;
+  }
+  else if (in > high){
+    return high;
+  }
+  else return in;
 }
 
 void irTurn(float sat){

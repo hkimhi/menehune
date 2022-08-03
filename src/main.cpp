@@ -59,26 +59,27 @@ void setup(void)
 }
 void loop()
 {
+  /*
   
-/*
-  printIntake();
-  resetIntake();
 
-  PIDDrive(170, 0.34, false, a, g, temp);
+  printIntake();
   intakeEnabled = true;
-  PIDTurn(-15, 1, a, g, temp); //first pedestal
-  PIDDrive(30, 0.28, false, a, g, temp);
-  PIDTurn(15, 1, a, g, temp); //facing chicken wire
-  //intakeOff();
-  PIDTurn(22.5, 0, a, g, temp);
-  PIDTurn(22.5, 1, a, g, temp);
-  PIDDrive(115, 0.28, false, a, g, temp);
-  PIDTurn(-22.5, 0, a, g, temp);
+  PIDDrive(176, 0.37, false, a, g, temp);
   resetIntake();
-  PIDDrive(30, 0.28, false, a, g, temp);
-  PIDTurn(-22.5, 0, a, g, temp);
-  PIDDrive(-50, 0.34, false, a, g, temp);
+  PIDTurn(-15, 1, a, g, temp); //first pedestal
+  PIDDrive(20, 0.27, false, a, g, temp);
+  PIDDrive(-20, 0.30, false, a, g, temp);
+  PIDTurn(60, 0, a, g, temp); //first pedestal
+  resetIntake();
+  PIDDrive(77, 0.37, false, a, g, temp);
+  PIDTurn(30, 1, a, g, temp); //first pedestal
+  PIDDrive(40, 0.27, false, a, g, temp);
+  PIDTurn(15, 1, a, g, temp); //first pedestal
+  PIDDrive(50, 0.37, false, a, g, temp);
   */
+  
+  PIDDrive(200, 0.37, true, a, g, temp);
+
   while (1)
   {
     display1.clearDisplay();
@@ -89,7 +90,7 @@ void loop()
     for(int i = 0; i < 1000; i++){
       analogRead(PA0);
     }
-    display1.println(goertzel(IR_PIN1, 10, 4));
+    display1.println((goertzel(IR_PIN1, 10, 4) - goertzel(IR_PIN2, 10, 4)) * 1000);
     display1.println("Encoder");
     display1.println(counter);
     display1.println(ij);
