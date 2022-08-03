@@ -11,6 +11,7 @@
 #define HALL_INPUT PB14    // Hall effect sensors to detect magnet
 
 // VARIABLES
+#define SERVO_CLOSED_POS_ADDR 0 // EEPROM memory address for servo closed position
 #define INTAKE_SERVO_OPEN_POS 0
 extern Servo intakeServo;
 extern bool intakeEnabled; // determines if the intake system is enabled or disabled

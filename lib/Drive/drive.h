@@ -8,8 +8,8 @@
 #include <ir_sensor.h>
 #include <math.h>
 // Pin I/O
-#define LEFT_FOWARD PA_7 // Left side drive, forward direction
-#define LEFT_REVERSE PB_0 // Left side drive, reverse direction
+#define LEFT_FOWARD PA_7   // Left side drive, forward direction
+#define LEFT_REVERSE PB_0  // Left side drive, reverse direction
 #define RIGHT_FOWARD PB_8  // Right side drive, forward direction
 #define RIGHT_REVERSE PB_9 // Riht side drive, reverse direction
 #define ENC_PIN PB12       // Motor encoder
@@ -31,6 +31,15 @@
 extern volatile float counter;
 extern volatile int ij;
 
+#define PID_SAT_ADDR 12
+#define PID_PTURN_ADDR 16
+#define PID_PIR_ADDR 20
+
+// Variables
+extern float sat;
+extern float pTurn;
+extern int pIR;
+
 void driveMotor(PinName fowardPin, PinName reversePin, float power);
 void PIDTurn(float setPoint, int dir, sensors_event_t a, sensors_event_t g, sensors_event_t temp);
 void PIDDrive(float setPoint, float sat, bool useIR, sensors_event_t a, sensors_event_t g, sensors_event_t temp);
@@ -39,5 +48,9 @@ void driveSetup();
 void printDrive(float power, int error, int errorSum, int prevError);
 void printDrive(float power, int error, int errorSum, int prevError, int timeout);
 float clip(float in, float low, float high);
+
+void setSat(float);
+void setPTurn(float);
+void setPIR(int);
 
 #endif

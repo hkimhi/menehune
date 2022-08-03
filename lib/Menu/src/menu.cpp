@@ -1,6 +1,9 @@
 #include "menu.h"
 #include "reflectance.h"
 #include "intake.h"
+#include "drive.h"
+#include "utils.h"
+#include <EEPROM.h>
 
 Item::Item(String name, std::vector<Option> options)
 {
@@ -10,23 +13,42 @@ Item::Item(String name, std::vector<Option> options)
 
 Option::Option(String name, int val, int maxVal, void (*func)(int))
 {
+    isInt = true;
     this->name = name;
-    this->val = val;
-    this->maxVal = maxVal;
-    this->func = func;
+    this->intVal = val;
+    this->intMaxVal = maxVal;
+    this->intFunc = func;
 }
 
-std::vector<Option> reflectanceOptions{Option("cliff ref", 150, 600, setReflectanceOneReference), Option("line ref", 1200, 3300, setReflectanceTwoReference)};
-std::vector<Option> driveOptions{};
-std::vector<Option> gyroOptions{};
-std::vector<Option> intakeOptions{Option("closed position", 180, 180, setClosedPosition)};
+Option::Option(String name, float val, float maxVal, void (*func)(float))
+{
+    isInt = false;
+    this->name = name;
+    this->floatVal = val;
+    this->floatMaxVal = maxVal;
+    this->floatFunc = func;
+}
 
-Item items[NUM_MENU_ITEMS] = {
-    Item("Reflect", reflectanceOptions),
-    Item("Drive", driveOptions),
-    Item("Gyro", gyroOptions),
-    Item("Intake", intakeOptions),
-};
+// Globals
+Item items[NUM_MENU_ITEMS] = {Item("default1", std::vector<Option>()), Item("default2", std::vector<Option>()), Item("default3", std::vector<Option>())};
+
+void initializeMenu()
+{
+    extern int referenceOneDutyCycle;
+    extern int referenceTwoDutyCycle;
+    extern int intakeServoClosedPosition;
+    extern float sat;
+    extern float pTurn;
+    extern int pIR;
+
+    std::vector<Option> reflectanceOptions{Option("cliff ref", referenceOneDutyCycle, 255, setReflectanceOneReference), Option("line ref", referenceTwoDutyCycle, 255, setReflectanceTwoReference)};
+    std::vector<Option> driveOptions{Option("sat", sat, 1.0, setSat), Option("pTurn", pTurn, 1, setPTurn), Option("pIR", pIR, 100, setPIR)};
+    std::vector<Option> intakeOptions{Option("closed position", intakeServoClosedPosition, 180, setClosedPosition)};
+
+    items[0] = Item("Reflect", reflectanceOptions);
+    items[1] = Item("Drive", driveOptions);
+    items[2] = Item("Intake", intakeOptions);
+}
 
 int selectedItem = 0;
 int selectedOption = 0;
@@ -128,6 +150,8 @@ void displayInfoScreen(Adafruit_SSD1306 display)
     display.printf("y: %i\n", analogRead(JOYSTICK_Y));
     display.printf("switch: %i\n", digitalRead(JOYSTICK_SWITCH));
 
+    display.printf("length: %i\n", EEPROM.length());
+
     display.display();
 }
 
@@ -149,23 +173,45 @@ void enterItem(Adafruit_SSD1306 display, Item &item)
             display.setTextColor(SSD1306_BLACK, SSD1306_WHITE);
             display.print(item.options[i].name);
             display.print(": ");
-            display.println(map(pot_val, 0, 3300, 0, item.options[i].maxVal));
-            // display.printf("%s: %i\n", item.options[i].name, pot_val);
+
+            if (item.options[i].isInt)
+            {
+                display.println(map(pot_val, 0, 3300, 0, item.options[i].intMaxVal));
+            }
+            else
+            {
+                display.println(mapf(pot_val, 0, 3300, 0, item.options[i].floatMaxVal));
+            }
         }
         else
         {
             display.setTextColor(SSD1306_WHITE);
             display.print(item.options[i].name);
             display.print(": ");
-            display.println(item.options[i].val);
-            // display.printf("%s: %i\n", item.options[i].name, item.options[i].value);
+
+            if (item.options[i].isInt)
+            {
+                display.println(item.options[i].intVal);
+            }
+            else
+            {
+                display.println(item.options[i].floatVal);
+            }
         }
     }
 
     if (!digitalRead(JOYSTICK_SWITCH))
     {
         // button pressed --> save value
-        item.options[selectedOption].val = map(pot_val, 0, 3300, 0, item.options[selectedOption].maxVal);
-        item.options[selectedOption].func(item.options[selectedOption].val);
+        if (item.options[selectedOption].isInt)
+        {
+            item.options[selectedOption].intVal = map(pot_val, 0, 3300, 0, item.options[selectedOption].intMaxVal);
+            item.options[selectedOption].intFunc(item.options[selectedOption].intVal);
+        }
+        else
+        {
+            item.options[selectedOption].floatVal = mapf(pot_val, 0, 3300, 0, item.options[selectedOption].floatMaxVal);
+            item.options[selectedOption].floatFunc(item.options[selectedOption].floatVal);
+        }
     }
 }

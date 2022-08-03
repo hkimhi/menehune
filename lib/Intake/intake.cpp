@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <Servo.h>
+#include <EEPROM.h>
 #include "intake.h"
 
 extern Adafruit_SSD1306 display1;
@@ -73,5 +74,6 @@ void resetClaw()
 
 void setClosedPosition(int closedPosition)
 {
+  EEPROM.put(SERVO_CLOSED_POS_ADDR, closedPosition);
   intakeServoClosedPosition = closedPosition;
 }

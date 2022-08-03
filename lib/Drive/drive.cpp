@@ -1,7 +1,12 @@
 #include "drive.h"
+#include <EEPROM.h>
 
 // GLOBAL VARIABLES //
 extern Adafruit_SSD1306 display1;
+
+float sat = 0.6;
+float pTurn = 0.1;
+int pIR = 25;
 
 volatile float counter = 0;
 volatile int ij = 0;
@@ -12,7 +17,7 @@ bool drive = false;
  *
  */
 void driveSetup()
-{ 
+{
   pinMode(ENC_PIN2, INPUT);
   pinMode(IR_PIN1, INPUT_ANALOG);
   pinMode(IR_PIN2, INPUT_ANALOG);
@@ -58,7 +63,6 @@ void driveMotor(PinName fowardPin, PinName reversePin, float power)
  */
 void PIDTurn(float setPoint, int dir, sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp)
 {
-  float sat = 0.6;
   float iSat = 100;
   float error, prevError, errorSum = 0;
   float power;
@@ -116,8 +120,6 @@ void PIDTurn(float setPoint, int dir, sensors_event_t accel, sensors_event_t gyr
 void PIDDrive(float dist, float sat, bool useIR, sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp)
 {
   float iSat = 100;
-  float pTurn = 0.1;
-  float pIR = -25;
   int error, prevError, errorSum = 0;
   float turnError, turnSet;
   float power, turnPower;
@@ -147,7 +149,7 @@ void PIDDrive(float dist, float sat, bool useIR, sensors_event_t accel, sensors_
     // integrate Errors
     errorSum += error;
     // Save Prev values for derivative
-  
+
     power += copysign(FFD, error);
 
     power = clip(power, -sat, sat);
@@ -159,24 +161,26 @@ void PIDDrive(float dist, float sat, bool useIR, sensors_event_t accel, sensors_
     prevError = error;
     delay(50);
 
-    //Calculate Angle Correction Error
-    if(!useIR){
-       turnPower = (turnError * pTurn);
+    // Calculate Angle Correction Error
+    if (!useIR)
+    {
+      turnPower = (turnError * pTurn);
     }
-    else{
+    else
+    {
       turnPower = (goertzel(IR_PIN1, 10, 4) - goertzel(IR_PIN2, 10, 4)) * pIR;
     }
 
-    //Clip Turnpower to Power to prevent robot from going backwards
+    // Clip Turnpower to Power to prevent robot from going backwards
     turnPower = clip(turnPower, -abs(power), abs(power));
 
-    //Apply power to motors
+    // Apply power to motors
     driveMotor(LEFT_FOWARD, LEFT_REVERSE, (power - turnPower) * LCOMP);
     driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, power + turnPower);
 
     printDrive(power, error, errorSum, prevError, timeout);
   }
-  //Stop Motors after Reaching destination
+  // Stop Motors after Reaching destination
   driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0);
   driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0);
 }
@@ -190,10 +194,12 @@ void PIDDrive(float dist, float sat, bool useIR, sensors_event_t accel, sensors_
  */
 void encCount()
 {
-  if((digitalRead(ENC_PIN) && digitalRead(ENC_PIN2)) || (!digitalRead(ENC_PIN) && !digitalRead(ENC_PIN2))){
+  if ((digitalRead(ENC_PIN) && digitalRead(ENC_PIN2)) || (!digitalRead(ENC_PIN) && !digitalRead(ENC_PIN2)))
+  {
     counter++;
   }
-  else if ((digitalRead(ENC_PIN) && !digitalRead(ENC_PIN2)) || (!digitalRead(ENC_PIN) && digitalRead(ENC_PIN2))){
+  else if ((digitalRead(ENC_PIN) && !digitalRead(ENC_PIN2)) || (!digitalRead(ENC_PIN) && digitalRead(ENC_PIN2)))
+  {
     counter--;
   }
 }
@@ -231,38 +237,81 @@ void printDrive(float power, int error, int errorSum, int prevError, int timeout
 
 /**
  * @brief Clips a value between a given low and high value
- * 
+ *
  * @param in value to be clipped
  * @param low low value for it to be clipped to
- * @param high high value for it to be clipped to 
- * 
+ * @param high high value for it to be clipped to
+ *
  * @return the value of min clamped between the low and high bounds
- * 
+ *
  */
-float clip(float in, float low, float high){
-  if(in < low){
+float clip(float in, float low, float high)
+{
+  if (in < low)
+  {
     return low;
   }
-  else if (in > high){
+  else if (in > high)
+  {
     return high;
   }
-  else return in;
+  else
+    return in;
 }
 
-void irTurn(float sat){
+void irTurn(float sat)
+{
   int irCount = 0;
   float power, error;
   int threshold = 0.01;
-  while(irCount < 10){
+  while (irCount < 10)
+  {
     error = goertzel(IR_PIN1, 10, 4) - goertzel(IR_PIN2, 10, 4);
     power = error * PTURNIR;
     clip(power, -sat, sat);
     driveMotor(LEFT_FOWARD, LEFT_REVERSE, -power);
     driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, power);
-    if(error < threshold){
+    if (error < threshold)
+    {
       irCount++;
     }
   }
   driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0);
   driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0);
+}
+
+/**
+ * @brief Sets the saturation value
+ *
+ * @param val value to put into sat
+ * @return None
+ */
+void setSat(float val)
+{
+  sat = val;
+  EEPROM.put(PID_SAT_ADDR, sat);
+}
+
+/**
+ * @brief Sets the pTurn value
+ *
+ * @param val value to put into pTurn
+ * @return None
+ */
+void setPTurn(float val)
+{
+  pTurn = val;
+  EEPROM.put(PID_PTURN_ADDR, pTurn);
+}
+
+/**
+ * @brief Sets the pIR value
+ *
+ * @param val value to put into pIR
+ * @return None
+ */
+void setPIR(int val)
+{
+  pIR = val;
+  EEPROM.put(PID_PIR_ADDR, pIR);
 }

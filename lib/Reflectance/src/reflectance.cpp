@@ -1,8 +1,9 @@
 #include "reflectance.h"
 #include "drive.h"
+#include <EEPROM.h>
 
-int referenceOneDutyCycle = 0;
-int referenceTwoDutyCycle = 0;
+int referenceOneDutyCycle;
+int referenceTwoDutyCycle;
 
 extern sensors_event_t a;
 extern sensors_event_t g;
@@ -41,6 +42,7 @@ void printReflectance()
 void setReflectanceOneReference(int duty_cycle)
 {
     referenceOneDutyCycle = duty_cycle;
+    EEPROM.put(REFLECTANCE_REF_ONE_ADDR, referenceOneDutyCycle);
     analogWrite(REFERENCE_ONE, duty_cycle);
 }
 
@@ -53,6 +55,7 @@ void setReflectanceOneReference(int duty_cycle)
 void setReflectanceTwoReference(int duty_cycle)
 {
     referenceTwoDutyCycle = duty_cycle;
+    EEPROM.put(REFLECTANCE_REF_TWO_ADDR, referenceTwoDutyCycle);
     analogWrite(REFERENCE_TWO, duty_cycle);
 }
 

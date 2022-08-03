@@ -16,22 +16,30 @@
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
 #define OLED_RESET -1    // This display does not have a reset pin accessible
 
-#define NUM_MENU_ITEMS 4
+#define NUM_MENU_ITEMS 3
 #define NUM_MAX_OPTIONS 4
 
 // Function Declarations
 void displayInfoScreen(Adafruit_SSD1306 display);
 void displayMenu(Adafruit_SSD1306 display);
+void initializeMenu();
 
 class Option
 {
 public:
     Option(String name, int val, int maxVal, void (*func)(int));
+    Option(String name, float val, float maxVal, void (*func)(float));
 
     String name;
-    int val;
-    int maxVal;
-    void (*func)(int);
+    bool isInt;
+
+    int intVal;
+    int intMaxVal;
+    void (*intFunc)(int);
+
+    float floatVal;
+    float floatMaxVal;
+    void (*floatFunc)(float);
 };
 
 class Item
