@@ -41,6 +41,8 @@ void setup(void)
   pinMode(REFLECTANCE_FOUR, INPUT_PULLUP);
   pinMode(REFLECTANCE_FIVE, INPUT_PULLUP);
   pinMode(REFLECTANCE_SIX, INPUT_PULLUP);
+  setReflectanceReference(1, 1500);
+  setReflectanceReference(2, 150);
 
   pinMode(SERVO_POS_POT, INPUT_ANALOG);
   pinMode(BUMPER_SWITCH, INPUT_PULLUP);

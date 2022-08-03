@@ -21,7 +21,7 @@ void driveSetup()
  *
  * @param fowardPin
  * @param reversePin
- * @param power The power to drive the motor. Accepts values in range 0 to 1, inclusive
+ * @param power The power to drive the motor. Accepts values in range -1 to 1, inclusive
  * @return None
  */
 void driveMotor(PinName fowardPin, PinName reversePin, float power)
@@ -47,7 +47,7 @@ void driveMotor(PinName fowardPin, PinName reversePin, float power)
  * @brief PID code using turning, setpoint is in degrees where + is CCW
  *
  * @param setPoint target angle
- * @param dir direction to turn, either +1 or -1
+ * @param dir direction to turn, either +1 (left side) or 0 (right side)
  * @param accel acceleration sensor event (xyz acceleration)
  * @param gyro gyro sensor event (xyz rotational velocity)
  * @param temp temperature sensor event
@@ -102,7 +102,7 @@ void PIDTurn(float setPoint, int dir, sensors_event_t accel, sensors_event_t gyr
       driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, power);
     }
 
-    printDrive(power, error, errorSum, prevError);
+    // printDrive(power, error, errorSum, prevError);
   }
   driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0);
   driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0);

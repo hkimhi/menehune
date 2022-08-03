@@ -18,4 +18,9 @@
 // Variables
 extern Adafruit_SSD1306 display1;
 
+// Function Declarations
+void printReflectance();
+void setReflectanceReference(int reference, int voltage);
+void align();
+
 #endif
