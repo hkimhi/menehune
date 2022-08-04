@@ -18,13 +18,13 @@
 #define IR_PIN2 PA_0
 
 // Constants
-#define P_TURN 0.5
+#define P_TURN 0.8
 #define I_TURN 0.01
 #define D_TURN 1
 #define P_DRIVE 0.05
 #define I_DRIVE 0.000
 #define D_DRIVE 0.1
-#define FFT 0.22
+#define FFT 0.27
 #define FFD 0.02
 #define LCOMP 1
 #define P_TURN_DRIVE 0.6

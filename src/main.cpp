@@ -36,6 +36,7 @@ sensors_event_t temp; // temperature sensor event
 
 void setup(void)
 {
+  // putEEPROMDefaults();
   getEEPROMVals();
   initializeMenu();
   pinMode(LED_BUILTIN, OUTPUT);
@@ -82,25 +83,27 @@ void setup(void)
 void loop()
 {
   //irTurn(0.5);
-  
-  PIDDrive(176, 0.39, false, a, g, temp);
+  PIDDrive(176, 0.5, false, a, g, temp);
   resetClaw();
   PIDTurn(-15, 1, a, g, temp); // first pedestal
-  PIDDrive(20, 0.27, false, a, g, temp);
+  intakeEnabled = true;
+  PIDDrive(20, 0.35, false, a, g, temp);
   delay(500);
-  PIDDrive(-20, 0.30, false, a, g, temp);
+  PIDDrive(-20, 0.35, false, a, g, temp);
   PIDTurn(15, 1, a, g, temp); //first pedestal
-  PIDDrive(33, 0.27, false, a, g, temp);
-  PIDTurn(44, 1, a, g, temp); //first pedestal
+  PIDDrive(31, 0.35, false, a, g, temp);
+  PIDTurn(43.5, 1, a, g, temp); //first pedestal
+  PIDDrive(60, 0.5, false, a, g, temp);
   resetClaw();
-  PIDDrive(60, 0.37, false, a, g, temp);
-  PIDDrive(50, 0.25, false, a, g, temp);
-  PIDDrive(-20, 0.25, false, a, g, temp);
+  intakeEnabled = true;
+  PIDDrive(50, 0.35, false, a, g, temp);
+  PIDDrive(-20, 0.35, false, a, g, temp);
+  onHit();
   PIDTurn(30, 0, a, g, temp); //first pedestal
-  PIDDrive(10, 0.25, false, a, g, temp);
+  PIDDrive(20, 0.32, false, a, g, temp);
   PIDTurn(15, 0, a, g, temp); //first pedestal
   irTurn(0.5);
-  PIDDrive(40, 0.25, true, a, g, temp);
+  PIDDrive(40, 0.35, true, a, g, temp);
   while (1)
   {
     displayMenu(display2);
@@ -114,7 +117,7 @@ void putEEPROMDefaults()
   EEPROM.put(SERVO_CLOSED_POS_ADDR, 140);
   EEPROM.put(REFLECTANCE_REF_ONE_ADDR, 150);
   EEPROM.put(REFLECTANCE_REF_TWO_ADDR, 150);
-  EEPROM.put(PID_TURN_SAT_ADDR, 0.6);
+  EEPROM.put(PID_TURN_SAT_ADDR, 0.83);
   EEPROM.put(PID_PIR_ADDR, 25);
   EEPROM.put(PID_PTURNIR_ADDR, 50);
   EEPROM.put(PID_DTURNIR_ADDR, 1000);
