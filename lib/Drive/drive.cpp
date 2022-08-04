@@ -4,8 +4,7 @@
 // GLOBAL VARIABLES //
 extern Adafruit_SSD1306 display1;
 
-float sat = 0.6;
-float pTurn = 0.1;
+float turnSat = 0.6;
 int pIR = 25;
 int pTurnIR = 50;
 int dTurnIR = 1000;
@@ -88,7 +87,7 @@ void PIDTurn(float setPoint, int dir, sensors_event_t accel, sensors_event_t gyr
     errorSum += error;
     // Save Prev values for derivative
     prevError = error;
-    power = clip(power, -sat, sat);
+    power = clip(power, -turnSat, turnSat);
     if (abs(error + prevError) / 2 < 0.6)
     {
       gyCo++;
@@ -121,7 +120,6 @@ void PIDTurn(float setPoint, int dir, sensors_event_t accel, sensors_event_t gyr
  */
 void PIDDrive(float dist, float satDr, bool useIR, sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp)
 { 
-  int dTurn = 50;
   float iSat = 100;
   int error, prevError, errorSum = 0;
   float turnError, turnSet, turnPrevError = 0;
@@ -166,8 +164,8 @@ void PIDDrive(float dist, float satDr, bool useIR, sensors_event_t accel, sensor
 
     //Calculate Angle Correction Error
     if(!useIR){
-       turnPower = (turnError * pTurn);
-       turnPower += (turnError - turnPrevError) * dTurn;
+       turnPower = (turnError * P_TURN_DRIVE);
+       turnPower += (turnError - turnPrevError) * D_TURN_DRIVE;
     }
     else{
       turnPower = (goertzel(IR_PIN1, 10, 4) * 1.1 - goertzel(IR_PIN2, 10, 4)) * pIR;
@@ -287,25 +285,13 @@ void irTurn(float sat)
 /**
  * @brief Sets the saturation value
  *
- * @param val value to put into sat
+ * @param val value to put into turnSat
  * @return None
  */
-void setSat(float val)
+void setTurnSat(float val)
 {
-  sat = val;
-  EEPROM.put(PID_SAT_ADDR, sat);
-}
-
-/**
- * @brief Sets the pTurn value
- *
- * @param val value to put into pTurn
- * @return None
- */
-void setPTurn(float val)
-{
-  pTurn = val;
-  EEPROM.put(PID_PTURN_ADDR, pTurn);
+  turnSat = val;
+  EEPROM.put(PID_TURN_SAT_ADDR, turnSat);
 }
 
 /**

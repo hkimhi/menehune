@@ -27,18 +27,18 @@
 #define FFT 0.22
 #define FFD 0.02
 #define LCOMP 1
+#define P_TURN_DRIVE 0.6
+#define D_TURN_DRIVE 0.7
 extern volatile float counter;
 extern volatile int ij;
 
-#define PID_SAT_ADDR 12
-#define PID_PTURN_ADDR 16
+#define PID_TURN_SAT_ADDR 12
 #define PID_PIR_ADDR 20
 #define PID_PTURNIR_ADDR 24
 #define PID_DTURNIR_ADDR 28
 
 // Variables
-extern float sat;
-extern float pTurn;
+extern float turnSat;
 extern int pIR;
 extern int pTurnIR;
 extern int dTurnIR;
@@ -53,8 +53,7 @@ void printDrive(float power, int error, int errorSum, int prevError, int timeout
 float clip(float in, float low, float high);
 void irTurn(float sat);
 
-void setSat(float);
-void setPTurn(float);
+void setTurnSat(float);
 void setPIR(int);
 void setPTurnIR(int);
 void setDTurnIR(int);

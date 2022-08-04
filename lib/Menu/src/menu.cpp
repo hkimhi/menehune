@@ -37,14 +37,14 @@ void initializeMenu()
     extern int referenceOneDutyCycle;
     extern int referenceTwoDutyCycle;
     extern int intakeServoClosedPosition;
-    extern float sat;
+    extern float turnSat;
     extern float pTurn;
     extern int pIR;
     extern int pTurnIR;
     extern int dTurnIR;
 
     std::vector<Option> reflectanceOptions{Option("cliff ref", referenceOneDutyCycle, 255, setReflectanceOneReference), Option("line ref", referenceTwoDutyCycle, 255, setReflectanceTwoReference)};
-    std::vector<Option> driveOptions{Option("sat", sat, 1.0, setSat), Option("pTurn", pTurn, 1, setPTurn), Option("pIR", pIR, 100, setPIR), Option("pTurnIR", pTurnIR, 1024, setPTurnIR), Option("dTurnIR", dTurnIR, 1024, setDTurnIR)};
+    std::vector<Option> driveOptions{Option("turnSat", turnSat, 1.0, setTurnSat), Option("pIR", pIR, 100, setPIR), Option("pTurnIR", pTurnIR, 1024, setPTurnIR), Option("dTurnIR", dTurnIR, 1024, setDTurnIR)};
     std::vector<Option> intakeOptions{Option("closed position", intakeServoClosedPosition, 180, setClosedPosition)};
 
     items[0] = Item("Reflect", reflectanceOptions);

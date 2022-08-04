@@ -81,7 +81,6 @@ void setup(void)
 }
 void loop()
 {
-
   //irTurn(0.5);
   
   PIDDrive(176, 0.39, false, a, g, temp);
@@ -115,8 +114,7 @@ void putEEPROMDefaults()
   EEPROM.put(SERVO_CLOSED_POS_ADDR, 140);
   EEPROM.put(REFLECTANCE_REF_ONE_ADDR, 150);
   EEPROM.put(REFLECTANCE_REF_TWO_ADDR, 150);
-  EEPROM.put(PID_SAT_ADDR, 0.6);
-  EEPROM.put(PID_PTURN_ADDR, 0.1);
+  EEPROM.put(PID_TURN_SAT_ADDR, 0.6);
   EEPROM.put(PID_PIR_ADDR, 25);
   EEPROM.put(PID_PTURNIR_ADDR, 50);
   EEPROM.put(PID_DTURNIR_ADDR, 1000);
@@ -133,8 +131,7 @@ void getEEPROMVals()
   setReflectanceOneReference(refOne);
   setReflectanceTwoReference(refTwo);
 
-  EEPROM.get(PID_SAT_ADDR, sat);
-  EEPROM.get(PID_PTURN_ADDR, pTurn);
+  EEPROM.get(PID_TURN_SAT_ADDR, turnSat);
   EEPROM.get(PID_PIR_ADDR, pIR);
   EEPROM.get(PID_PTURNIR_ADDR, pTurnIR);
   EEPROM.get(PID_DTURNIR_ADDR, dTurnIR);
