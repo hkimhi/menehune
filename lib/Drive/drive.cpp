@@ -7,6 +7,8 @@ extern Adafruit_SSD1306 display1;
 float sat = 0.6;
 float pTurn = 0.1;
 int pIR = 25;
+int pTurnIR = 50;
+int dTurnIR = 1000;
 
 volatile float counter = 0;
 volatile int ij = 0;
@@ -63,10 +65,6 @@ void driveMotor(PinName fowardPin, PinName reversePin, float power)
  */
 void PIDTurn(float setPoint, int dir, sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp)
 {
-<<<<<<< Updated upstream
-=======
-  float sat = 0.63;
->>>>>>> Stashed changes
   float iSat = 100;
   float error, prevError, errorSum = 0;
   float power;
@@ -121,15 +119,10 @@ void PIDTurn(float setPoint, int dir, sensors_event_t accel, sensors_event_t gyr
  * @param temp temperature sensor event
  * @return None
  */
-void PIDDrive(float dist, float sat, bool useIR, sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp)
-{
+void PIDDrive(float dist, float satDr, bool useIR, sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp)
+{ 
+  int dTurn = 50;
   float iSat = 100;
-<<<<<<< Updated upstream
-=======
-  float pTurn = 0.6;
-  float dTurn = 0.5;
-  int pIR = 25;
->>>>>>> Stashed changes
   int error, prevError, errorSum = 0;
   float turnError, turnSet, turnPrevError = 0;
   float power, turnPower;
@@ -139,8 +132,8 @@ void PIDDrive(float dist, float sat, bool useIR, sensors_event_t accel, sensors_
   float setPoint = (dist / (6.28 * 3.5)) * 48;
   readGyro(accel, gyro, temp);
   turnSet = z;
-  driveMotor(LEFT_FOWARD, LEFT_REVERSE, copysign(sat, dist));
-  driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, copysign(sat, dist));
+  driveMotor(LEFT_FOWARD, LEFT_REVERSE, copysign(satDr, dist));
+  driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, copysign(satDr, dist));
   while ((timeout < 25))
   {
 
@@ -162,7 +155,7 @@ void PIDDrive(float dist, float sat, bool useIR, sensors_event_t accel, sensors_
 
     power += copysign(FFD, error);
 
-    power = clip(power, -sat, sat);
+    power = clip(power, -satDr, satDr);
 
     if ((prevError == error) || abs(error + prevError) <= 2)
     {
@@ -171,16 +164,6 @@ void PIDDrive(float dist, float sat, bool useIR, sensors_event_t accel, sensors_
     prevError = error;
     delay(10);
 
-<<<<<<< Updated upstream
-    // Calculate Angle Correction Error
-    if (!useIR)
-    {
-      turnPower = (turnError * pTurn);
-    }
-    else
-    {
-      turnPower = (goertzel(IR_PIN1, 10, 4) - goertzel(IR_PIN2, 10, 4)) * pIR;
-=======
     //Calculate Angle Correction Error
     if(!useIR){
        turnPower = (turnError * pTurn);
@@ -188,7 +171,6 @@ void PIDDrive(float dist, float sat, bool useIR, sensors_event_t accel, sensors_
     }
     else{
       turnPower = (goertzel(IR_PIN1, 10, 4) * 1.1 - goertzel(IR_PIN2, 10, 4)) * pIR;
->>>>>>> Stashed changes
     }
 
     // Clip Turnpower to Power to prevent robot from going backwards
@@ -287,10 +269,10 @@ void irTurn(float sat)
   int threshold = 0.001;
   while(irCount < 100){
     error = goertzel(IR_PIN1, 10, 4) - goertzel(IR_PIN2, 10, 4);
-    power = error * PTURNIR;
-    power += (error - prevError) * DTURNIR;
+    power = error * -pTurnIR;
+    power += (error - prevError) * -dTurnIR;
     prevError = error;
-    clip(power, -sat, sat);
+    power = clip(power, -sat, sat);
     driveMotor(LEFT_FOWARD, LEFT_REVERSE, -power);
     driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, power);
     if (error < threshold)
@@ -336,4 +318,26 @@ void setPIR(int val)
 {
   pIR = val;
   EEPROM.put(PID_PIR_ADDR, pIR);
+}
+
+/**
+ * @brief Sets the pTurnIR value
+ *
+ * @param val value to put into pTurnIR
+ * @return None
+ */
+void setPTurnIR(int val) {
+  pTurnIR = val;
+  EEPROM.put(PID_PTURNIR_ADDR, pTurnIR);
+}
+
+/**
+ * @brief Sets the dTurnIR value
+ *
+ * @param val value to put into dTurnIR
+ * @return None
+ */
+void setDTurnIR(int val){
+  dTurnIR = val;
+  EEPROM.put(PID_DTURNIR_ADDR, dTurnIR);
 }

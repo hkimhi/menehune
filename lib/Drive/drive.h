@@ -27,19 +27,21 @@
 #define FFT 0.22
 #define FFD 0.02
 #define LCOMP 1
-#define PTURNIR -50
-#define DTURNIR -1000
 extern volatile float counter;
 extern volatile int ij;
 
 #define PID_SAT_ADDR 12
 #define PID_PTURN_ADDR 16
 #define PID_PIR_ADDR 20
+#define PID_PTURNIR_ADDR 24
+#define PID_DTURNIR_ADDR 28
 
 // Variables
 extern float sat;
 extern float pTurn;
 extern int pIR;
+extern int pTurnIR;
+extern int dTurnIR;
 
 void driveMotor(PinName fowardPin, PinName reversePin, float power);
 void PIDTurn(float setPoint, int dir, sensors_event_t a, sensors_event_t g, sensors_event_t temp);
@@ -54,5 +56,7 @@ void irTurn(float sat);
 void setSat(float);
 void setPTurn(float);
 void setPIR(int);
+void setPTurnIR(int);
+void setDTurnIR(int);
 
 #endif

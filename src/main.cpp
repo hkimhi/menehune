@@ -5,7 +5,6 @@
 #include <math.h>
 #include <Servo.h>
 #include <EEPROM.h>
-
 #include "drive.h"
 #include "gyro.h"
 #include "ir_sensor.h"
@@ -58,7 +57,6 @@ void setup(void)
   pinMode(HALL_INPUT, INPUT_PULLUP);
   intakeServo.attach(SERVO);
   intakeServo.write(INTAKE_SERVO_OPEN_POS);
-  // intakeServo.write(intakeServoClosedPosition);*/
   display1.begin(SSD1306_SWITCHCAPVCC, 0x3C);
   display2.begin(SSD1306_SWITCHCAPVCC, 0x3D);
   attachInterrupt(digitalPinToInterrupt(BUMPER_SWITCH), onHit, FALLING);     // SWITCH_INPUT is regular high (Switches in parallel with internal pull-up)
@@ -79,38 +77,19 @@ void setup(void)
   display1.setCursor(0, 0);
   display1.println("MPU6050 Found!");
   display1.display();
-
   delay(100);
 }
 void loop()
 {
-<<<<<<< Updated upstream
-  displayMenu(display2);
-  displayInfoScreen(display1);
 
-  /*
-  intakeEnabled = true;
-  PIDDrive(176, 0.37, false, a, g, temp);
-=======
-  irTurn(0.5);
-  /*intakeEnabled = true;
+  //irTurn(0.5);
+  
   PIDDrive(176, 0.39, false, a, g, temp);
->>>>>>> Stashed changes
   resetClaw();
   PIDTurn(-15, 1, a, g, temp); // first pedestal
   PIDDrive(20, 0.27, false, a, g, temp);
   delay(500);
   PIDDrive(-20, 0.30, false, a, g, temp);
-<<<<<<< Updated upstream
-  PIDTurn(60, 0, a, g, temp); // first pedestal
-  resetClaw();
-  PIDDrive(77, 0.37, false, a, g, temp);
-  PIDTurn(30, 1, a, g, temp); // first pedestal
-  PIDDrive(40, 0.27, false, a, g, temp);
-  PIDTurn(15, 1, a, g, temp); // first pedestal
-  PIDDrive(50, 0.37, false, a, g, temp);
-
-=======
   PIDTurn(15, 1, a, g, temp); //first pedestal
   PIDDrive(33, 0.27, false, a, g, temp);
   PIDTurn(44, 1, a, g, temp); //first pedestal
@@ -121,30 +100,14 @@ void loop()
   PIDTurn(30, 0, a, g, temp); //first pedestal
   PIDDrive(10, 0.25, false, a, g, temp);
   PIDTurn(15, 0, a, g, temp); //first pedestal
-  PIDDrive(40, 0.25, true, a, g, temp);*/
->>>>>>> Stashed changes
+  irTurn(0.5);
+  PIDDrive(40, 0.25, true, a, g, temp);
   while (1)
   {
-    display1.clearDisplay();
-    display1.setTextSize(1);
-    display1.setTextColor(SSD1306_WHITE);
-    display1.setCursor(0, 0);
-<<<<<<< Updated upstream
-    float start = millis();
-    for (int i = 0; i < 1000; i++)
-    {
-      analogRead(PA0);
-    }
-    display1.println((goertzel(IR_PIN1, 10, 4) - goertzel(IR_PIN2, 10, 4)) * 1000);
-    display1.println("Encoder");
-    display1.println(counter);
-    display1.println(ij);
-=======
-    display1.println((goertzel(IR_PIN1, 10, 4) * 1.1 - goertzel(IR_PIN2, 10, 4)) * 25);
->>>>>>> Stashed changes
-    display1.display();
+    displayMenu(display2);
+    displayInfoScreen(display1);
   }
-  */
+
 }
 
 void putEEPROMDefaults()
@@ -155,6 +118,8 @@ void putEEPROMDefaults()
   EEPROM.put(PID_SAT_ADDR, 0.6);
   EEPROM.put(PID_PTURN_ADDR, 0.1);
   EEPROM.put(PID_PIR_ADDR, 25);
+  EEPROM.put(PID_PTURNIR_ADDR, 50);
+  EEPROM.put(PID_DTURNIR_ADDR, 1000);
 }
 
 void getEEPROMVals()
@@ -165,10 +130,12 @@ void getEEPROMVals()
   int refTwo;
   EEPROM.get(REFLECTANCE_REF_ONE_ADDR, refOne);
   EEPROM.get(REFLECTANCE_REF_TWO_ADDR, refTwo);
-  setReflectanceOneReference(refOne);
+  //setReflectanceOneReference(refOne);
   setReflectanceTwoReference(refTwo);
 
   EEPROM.get(PID_SAT_ADDR, sat);
   EEPROM.get(PID_PTURN_ADDR, pTurn);
   EEPROM.get(PID_PIR_ADDR, pIR);
+  EEPROM.get(PID_PTURNIR_ADDR, pTurnIR);
+  EEPROM.get(PID_DTURNIR_ADDR, dTurnIR);
 }
