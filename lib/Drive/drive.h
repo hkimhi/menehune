@@ -27,7 +27,8 @@
 #define FFT 0.22
 #define FFD 0.02
 #define LCOMP 1
-#define PTURNIR 1
+#define PTURNIR -50
+#define DTURNIR -1000
 extern volatile float counter;
 extern volatile int ij;
 
@@ -48,6 +49,7 @@ void driveSetup();
 void printDrive(float power, int error, int errorSum, int prevError);
 void printDrive(float power, int error, int errorSum, int prevError, int timeout);
 float clip(float in, float low, float high);
+void irTurn(float sat);
 
 void setSat(float);
 void setPTurn(float);

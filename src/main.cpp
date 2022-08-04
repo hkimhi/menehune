@@ -84,16 +84,24 @@ void setup(void)
 }
 void loop()
 {
+<<<<<<< Updated upstream
   displayMenu(display2);
   displayInfoScreen(display1);
 
   /*
   intakeEnabled = true;
   PIDDrive(176, 0.37, false, a, g, temp);
+=======
+  irTurn(0.5);
+  /*intakeEnabled = true;
+  PIDDrive(176, 0.39, false, a, g, temp);
+>>>>>>> Stashed changes
   resetClaw();
   PIDTurn(-15, 1, a, g, temp); // first pedestal
   PIDDrive(20, 0.27, false, a, g, temp);
+  delay(500);
   PIDDrive(-20, 0.30, false, a, g, temp);
+<<<<<<< Updated upstream
   PIDTurn(60, 0, a, g, temp); // first pedestal
   resetClaw();
   PIDDrive(77, 0.37, false, a, g, temp);
@@ -102,12 +110,26 @@ void loop()
   PIDTurn(15, 1, a, g, temp); // first pedestal
   PIDDrive(50, 0.37, false, a, g, temp);
 
+=======
+  PIDTurn(15, 1, a, g, temp); //first pedestal
+  PIDDrive(33, 0.27, false, a, g, temp);
+  PIDTurn(44, 1, a, g, temp); //first pedestal
+  resetClaw();
+  PIDDrive(60, 0.37, false, a, g, temp);
+  PIDDrive(50, 0.25, false, a, g, temp);
+  PIDDrive(-20, 0.25, false, a, g, temp);
+  PIDTurn(30, 0, a, g, temp); //first pedestal
+  PIDDrive(10, 0.25, false, a, g, temp);
+  PIDTurn(15, 0, a, g, temp); //first pedestal
+  PIDDrive(40, 0.25, true, a, g, temp);*/
+>>>>>>> Stashed changes
   while (1)
   {
     display1.clearDisplay();
     display1.setTextSize(1);
     display1.setTextColor(SSD1306_WHITE);
     display1.setCursor(0, 0);
+<<<<<<< Updated upstream
     float start = millis();
     for (int i = 0; i < 1000; i++)
     {
@@ -117,6 +139,9 @@ void loop()
     display1.println("Encoder");
     display1.println(counter);
     display1.println(ij);
+=======
+    display1.println((goertzel(IR_PIN1, 10, 4) * 1.1 - goertzel(IR_PIN2, 10, 4)) * 25);
+>>>>>>> Stashed changes
     display1.display();
   }
   */

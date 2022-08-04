@@ -63,6 +63,10 @@ void driveMotor(PinName fowardPin, PinName reversePin, float power)
  */
 void PIDTurn(float setPoint, int dir, sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp)
 {
+<<<<<<< Updated upstream
+=======
+  float sat = 0.63;
+>>>>>>> Stashed changes
   float iSat = 100;
   float error, prevError, errorSum = 0;
   float power;
@@ -102,7 +106,7 @@ void PIDTurn(float setPoint, int dir, sensors_event_t accel, sensors_event_t gyr
       driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, power);
     }
 
-    // printDrive(power, error, errorSum, prevError);
+    printDrive(power, error, errorSum, prevError);
   }
   driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0);
   driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0);
@@ -120,8 +124,14 @@ void PIDTurn(float setPoint, int dir, sensors_event_t accel, sensors_event_t gyr
 void PIDDrive(float dist, float sat, bool useIR, sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp)
 {
   float iSat = 100;
+<<<<<<< Updated upstream
+=======
+  float pTurn = 0.6;
+  float dTurn = 0.5;
+  int pIR = 25;
+>>>>>>> Stashed changes
   int error, prevError, errorSum = 0;
-  float turnError, turnSet;
+  float turnError, turnSet, turnPrevError = 0;
   float power, turnPower;
   int start = counter;
   int timeout = 0;
@@ -131,7 +141,7 @@ void PIDDrive(float dist, float sat, bool useIR, sensors_event_t accel, sensors_
   turnSet = z;
   driveMotor(LEFT_FOWARD, LEFT_REVERSE, copysign(sat, dist));
   driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, copysign(sat, dist));
-  while ((timeout < 10))
+  while ((timeout < 25))
   {
 
     readGyro(accel, gyro, temp);
@@ -159,8 +169,9 @@ void PIDDrive(float dist, float sat, bool useIR, sensors_event_t accel, sensors_
       timeout++;
     }
     prevError = error;
-    delay(50);
+    delay(10);
 
+<<<<<<< Updated upstream
     // Calculate Angle Correction Error
     if (!useIR)
     {
@@ -169,10 +180,20 @@ void PIDDrive(float dist, float sat, bool useIR, sensors_event_t accel, sensors_
     else
     {
       turnPower = (goertzel(IR_PIN1, 10, 4) - goertzel(IR_PIN2, 10, 4)) * pIR;
+=======
+    //Calculate Angle Correction Error
+    if(!useIR){
+       turnPower = (turnError * pTurn);
+       turnPower += (turnError - turnPrevError) * dTurn;
+    }
+    else{
+      turnPower = (goertzel(IR_PIN1, 10, 4) * 1.1 - goertzel(IR_PIN2, 10, 4)) * pIR;
+>>>>>>> Stashed changes
     }
 
     // Clip Turnpower to Power to prevent robot from going backwards
     turnPower = clip(turnPower, -abs(power), abs(power));
+    turnPrevError = turnError;
 
     // Apply power to motors
     driveMotor(LEFT_FOWARD, LEFT_REVERSE, (power - turnPower) * LCOMP);
@@ -262,12 +283,13 @@ float clip(float in, float low, float high)
 void irTurn(float sat)
 {
   int irCount = 0;
-  float power, error;
-  int threshold = 0.01;
-  while (irCount < 10)
-  {
+  float power, error, prevError;
+  int threshold = 0.001;
+  while(irCount < 100){
     error = goertzel(IR_PIN1, 10, 4) - goertzel(IR_PIN2, 10, 4);
     power = error * PTURNIR;
+    power += (error - prevError) * DTURNIR;
+    prevError = error;
     clip(power, -sat, sat);
     driveMotor(LEFT_FOWARD, LEFT_REVERSE, -power);
     driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, power);
