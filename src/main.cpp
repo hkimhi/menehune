@@ -130,7 +130,7 @@ void getEEPROMVals()
   int refTwo;
   EEPROM.get(REFLECTANCE_REF_ONE_ADDR, refOne);
   EEPROM.get(REFLECTANCE_REF_TWO_ADDR, refTwo);
-  //setReflectanceOneReference(refOne);
+  setReflectanceOneReference(refOne);
   setReflectanceTwoReference(refTwo);
 
   EEPROM.get(PID_SAT_ADDR, sat);
