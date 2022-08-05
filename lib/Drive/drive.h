@@ -20,7 +20,7 @@
 // Constants
 #define P_TURN 0.8
 #define I_TURN 0.01
-#define D_TURN 1.9
+#define D_TURN 2
 #define P_DRIVE 0.05
 #define I_DRIVE 0.000
 #define D_DRIVE 0.1

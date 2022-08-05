@@ -86,7 +86,7 @@ void loop()
   resetGyro();
   PIDTurn(-17, 1, a, g, temp); // aim towards first pedestal (CW)
   intakeEnabled = true;
-  PIDDrive(20, 0.29, false, a, g, temp);  // drive at pedestal
+  PIDDrive(20, 0.24, false, a, g, temp);  // drive at pedestal
   delay(500);                             // pick up treasure
   PIDDrive(-20, 0.32, false, a, g, temp); // reverse from pedestal
   intakeEnabled = false;
@@ -94,47 +94,50 @@ void loop()
 
   resetGyro();
   PIDDrive(31, 0.30, false, a, g, temp); // drive forward about to the surface edge
-  PIDTurn(28, 1, a, g, temp);            // rotate CCW
-  PIDDrive(40, 0.30, false, a, g, temp); // drive towards surface edge at angle
+  PIDTurn(27, 1, a, g, temp);            // rotate CCW
 
-  while (!digitalRead(REFLECTANCE_ONE))
-  {
-    // drive until right wing detecting cliff
-    driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.3);
-    driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0.3);
+  while(isBumper()){
+    while (!digitalRead(REFLECTANCE_ONE) &&  isBumper())
+    {
+      // drive until right wing detecting cliff
+      driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.3);
+      driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0.3);
+    }
+
+    while (digitalRead(REFLECTANCE_ONE) && isBumper())
+    {
+      // turn until right wing not detecting cliff
+      driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.15);
+      driveMotor(LEFT_FOWARD, LEFT_REVERSE, -0.8);
+    }
+
+    delay(25);
+    intakeEnabled = true;
+    resetClaw();
   }
-
-  while (digitalRead(REFLECTANCE_ONE))
-  {
-    // turn until right wing not detecting cliff
-    driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.15);
-    driveMotor(LEFT_FOWARD, LEFT_REVERSE, -0.7);
-  }
-
-  delay(100);
-
   driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0);
   driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0);
-  /*
-
-  while (isBumper())
-  {
-    driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.28);
-    driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0.28);
-  }
-
+  PIDDrive(10, 0.1, false, a, g, temp);
   intakeEnabled = true;
-  driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0);
-  driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0);
+  resetClaw();
+  onHit();
   delay(500);
   resetGyro();
   PIDDrive(-20, 0.30, false, a, g, temp);
   onHit();
+  intakeEnabled = false;
   PIDTurn(22.5, 0, a, g, temp); // first pedestal
-  PIDDrive(25, 0.30, false, a, g, temp);
+  PIDDrive(30, 0.30, false, a, g, temp);
+  PIDTurn(30, 1, a, g, temp); // first pedestal
+  PIDDrive(10, 0.25, false, a, g, temp);
+  PIDTurn(35, 1, a, g, temp); // first pedestal
+  PIDDrive(10, 0.25, false, a, g, temp);
+  PIDTurn(40, 1, a, g, temp); // first pedestal
+  PIDDrive(10, 0.25, false, a, g, temp);
   PIDTurn(45, 1, a, g, temp); // first pedestal
+  PIDDrive(30, 0.25, false, a, g, temp);
+
   irTurn(0.5);
-  */
 
   /*PIDDrive(20, 0.30, false, a, g, temp);
   PIDTurn(90, 1, a, g, temp); //first pedestal
@@ -144,8 +147,13 @@ void loop()
   while (1)
   {
     displayMenu(display2);
-    displayInfoScreen(display1);
-  }
+    //displayInfoScreen(display1);
+    display1.clearDisplay();
+    display1.setTextSize(1);
+    display1.setTextColor(SSD1306_WHITE);
+    display1.setCursor(0, 0);
+    display1.println(digitalRead(REFLECTANCE_ONE));
+    display1.display();  }
 }
 
 void putEEPROMDefaults()
