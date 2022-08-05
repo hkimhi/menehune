@@ -20,7 +20,7 @@
 // Constants
 #define P_TURN 0.8
 #define I_TURN 0.01
-#define D_TURN 1
+#define D_TURN 2
 #define P_DRIVE 0.05
 #define I_DRIVE 0.000
 #define D_DRIVE 0.1
@@ -28,7 +28,7 @@
 #define FFD 0.02
 #define LCOMP 1
 #define P_TURN_DRIVE 0.6
-#define D_TURN_DRIVE 0.7
+#define D_TURN_DRIVE 0.4
 extern volatile float counter;
 extern volatile int ij;
 

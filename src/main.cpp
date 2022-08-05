@@ -37,7 +37,7 @@ sensors_event_t temp; // temperature sensor event
 void setup(void)
 {
   // putEEPROMDefaults();
-  getEEPROMVals();
+  // getEEPROMVals();
   initializeMenu();
   pinMode(LED_BUILTIN, OUTPUT);
 
@@ -82,34 +82,62 @@ void setup(void)
 }
 void loop()
 {
-  //irTurn(0.5);
-  PIDDrive(176, 0.5, false, a, g, temp);
+
+  PIDDrive(176, 0.50, false, a, g, temp);
   resetClaw();
-  PIDTurn(-15, 1, a, g, temp); // first pedestal
+  resetGyro();
+  PIDTurn(-17, 1, a, g, temp); // first pedestal
   intakeEnabled = true;
-  PIDDrive(20, 0.35, false, a, g, temp);
+  PIDDrive(20, 0.29, false, a, g, temp);
   delay(500);
-  PIDDrive(-20, 0.35, false, a, g, temp);
-  PIDTurn(15, 1, a, g, temp); //first pedestal
-  PIDDrive(31, 0.35, false, a, g, temp);
-  PIDTurn(43.5, 1, a, g, temp); //first pedestal
-  PIDDrive(60, 0.5, false, a, g, temp);
+  PIDDrive(-20, 0.32, false, a, g, temp);
+  PIDTurn(0, 1, a, g, temp); // first pedestal
+
+  resetGyro();
+  PIDDrive(31, 0.30, false, a, g, temp);
+  PIDTurn(30, 1, a, g, temp); // first pedestal
   resetClaw();
-  intakeEnabled = true;
-  PIDDrive(50, 0.35, false, a, g, temp);
-  PIDDrive(-20, 0.35, false, a, g, temp);
+  PIDDrive(40, 0.30, false, a, g, temp);
+  while (!digitalRead(REFLECTANCE_ONE) && isBumper())
+  {
+    driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.28);
+    driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0.28);
+  }
+
+  while (digitalRead(REFLECTANCE_ONE) && isBumper())
+  {
+    driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.15);
+    driveMotor(LEFT_FOWARD, LEFT_REVERSE, -0.77);
+  }
+  delay(100);
+  resetClaw();
+  while (isBumper())
+  {
+    driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.28);
+    driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0.28);
+  }
+  driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0);
+  driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0);
+  delay(500);
+  resetGyro();
+  PIDDrive(-20, 0.30, false, a, g, temp);
   onHit();
-  PIDTurn(30, 0, a, g, temp); //first pedestal
-  PIDDrive(20, 0.32, false, a, g, temp);
-  PIDTurn(15, 0, a, g, temp); //first pedestal
+  PIDTurn(22.5, 0, a, g, temp); // first pedestal
+  PIDDrive(25, 0.30, false, a, g, temp);
+  PIDTurn(45, 1, a, g, temp); // first pedestal
   irTurn(0.5);
-  PIDDrive(40, 0.35, true, a, g, temp);
+
+  /*PIDDrive(20, 0.30, false, a, g, temp);
+  PIDTurn(90, 1, a, g, temp); //first pedestal
+  irTurn(0.5);
+  resetGyro();
+  PIDDrive(40, 0.27, true, a, g, temp);*/
   while (1)
   {
     displayMenu(display2);
-    displayInfoScreen(display1);
+    // displayInfoScreen(display1);
+    printReflectance();
   }
-
 }
 
 void putEEPROMDefaults()

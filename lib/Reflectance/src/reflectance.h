@@ -6,14 +6,14 @@
 
 // PIN I/O
 #define REFERENCE_ONE PA_9
-#define REFLECTANCE_ONE PA11
-#define REFLECTANCE_TWO PA12
-#define REFLECTANCE_THREE PA15
+#define REFLECTANCE_ONE PA11   // right wing
+#define REFLECTANCE_TWO PA12   // left wing
+#define REFLECTANCE_THREE PA15 // back
 
 #define REFERENCE_TWO PA_10
-#define REFLECTANCE_FOUR PB3
-#define REFLECTANCE_FIVE PB4
-#define REFLECTANCE_SIX PB5
+#define REFLECTANCE_FOUR PB3 // front left
+#define REFLECTANCE_FIVE PB4 // front middle
+#define REFLECTANCE_SIX PB5  // front right
 
 // Variables
 #define REFLECTANCE_REF_ONE_ADDR 4 // EEPROM memory address for reflectance one reference

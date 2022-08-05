@@ -77,3 +77,7 @@ void setClosedPosition(int closedPosition)
   EEPROM.put(SERVO_CLOSED_POS_ADDR, closedPosition);
   intakeServoClosedPosition = closedPosition;
 }
+
+bool isBumper(){
+  return digitalRead(BUMPER_SWITCH);
+}

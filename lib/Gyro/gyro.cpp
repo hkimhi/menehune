@@ -47,8 +47,8 @@ void calibrateGyro(sensors_event_t accel, sensors_event_t gyro, sensors_event_t 
   }
 
   my_mpu.setAccelerometerRange(MPU6050_RANGE_8_G);
-  my_mpu.setGyroRange(MPU6050_RANGE_500_DEG);
-  my_mpu.setFilterBandwidth(MPU6050_BAND_94_HZ);
+  my_mpu.setGyroRange(MPU6050_RANGE_2000_DEG);
+  my_mpu.setFilterBandwidth(MPU6050_BAND_44_HZ);
   my_mpu.getEvent(&accel, &gyro, &temp);
   xOff = -gyro.gyro.x;
   yOff = -gyro.gyro.y;
@@ -82,5 +82,7 @@ void printGyro()
   display1.println(y);
   display1.print("Rotation Z: ");
   display1.println(z);
+  display1.println(my_mpu.getSampleRateDivisor());
   display1.display();
+
 }

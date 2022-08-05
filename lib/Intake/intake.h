@@ -23,5 +23,6 @@ void onHit();
 void onDetectBomb();
 void resetClaw();
 void setClosedPosition(int);
+bool isBumper();
 
 #endif

@@ -64,13 +64,13 @@ void driveMotor(PinName fowardPin, PinName reversePin, float power)
  */
 void PIDTurn(float setPoint, int dir, sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp)
 {
-  float turnSat = 0.83;
+  float turnSat = 0.79;
   float iSat = 100;
   float error, prevError, errorSum = 0;
   float power;
   //resetGyro();
   int gyCo = 0;
-  while (gyCo < 10)
+  while (gyCo < 13)
   {
     readGyro(accel, gyro, temp);
     // printGyro();
@@ -161,7 +161,7 @@ void PIDDrive(float dist, float satDr, bool useIR, sensors_event_t accel, sensor
       timeout++;
     }
     prevError = error;
-    delay(10);
+    delay(5);
 
     //Calculate Angle Correction Error
     if(!useIR){
