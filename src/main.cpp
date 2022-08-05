@@ -37,7 +37,7 @@ sensors_event_t temp; // temperature sensor event
 void setup(void)
 {
   // putEEPROMDefaults();
-  // getEEPROMVals();
+  getEEPROMVals();
   initializeMenu();
   pinMode(LED_BUILTIN, OUTPUT);
 
@@ -82,40 +82,48 @@ void setup(void)
 }
 void loop()
 {
-
-  PIDDrive(176, 0.50, false, a, g, temp);
-  resetClaw();
+  PIDDrive(175, 0.50, false, a, g, temp); // drive up starting ramp
   resetGyro();
-  PIDTurn(-17, 1, a, g, temp); // first pedestal
+  PIDTurn(-17, 1, a, g, temp); // aim towards first pedestal (CW)
   intakeEnabled = true;
-  PIDDrive(20, 0.29, false, a, g, temp);
-  delay(500);
-  PIDDrive(-20, 0.32, false, a, g, temp);
-  PIDTurn(0, 1, a, g, temp); // first pedestal
+  PIDDrive(20, 0.29, false, a, g, temp);  // drive at pedestal
+  delay(500);                             // pick up treasure
+  PIDDrive(-20, 0.32, false, a, g, temp); // reverse from pedestal
+  intakeEnabled = false;
+  PIDTurn(0, 1, a, g, temp); // turn away from pedestal (CCW)
 
   resetGyro();
-  PIDDrive(31, 0.30, false, a, g, temp);
-  PIDTurn(30, 1, a, g, temp); // first pedestal
-  resetClaw();
-  PIDDrive(40, 0.30, false, a, g, temp);
-  while (!digitalRead(REFLECTANCE_ONE) && isBumper())
+  PIDDrive(31, 0.30, false, a, g, temp); // drive forward about to the surface edge
+  PIDTurn(28, 1, a, g, temp);            // rotate CCW
+  PIDDrive(40, 0.30, false, a, g, temp); // drive towards surface edge at angle
+
+  while (!digitalRead(REFLECTANCE_ONE))
   {
-    driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.28);
-    driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0.28);
+    // drive until right wing detecting cliff
+    driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.3);
+    driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0.3);
   }
 
-  while (digitalRead(REFLECTANCE_ONE) && isBumper())
+  while (digitalRead(REFLECTANCE_ONE))
   {
+    // turn until right wing not detecting cliff
     driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.15);
-    driveMotor(LEFT_FOWARD, LEFT_REVERSE, -0.77);
+    driveMotor(LEFT_FOWARD, LEFT_REVERSE, -0.7);
   }
+
   delay(100);
-  resetClaw();
+
+  driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0);
+  driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0);
+  /*
+
   while (isBumper())
   {
     driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.28);
     driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0.28);
   }
+
+  intakeEnabled = true;
   driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0);
   driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0);
   delay(500);
@@ -126,6 +134,7 @@ void loop()
   PIDDrive(25, 0.30, false, a, g, temp);
   PIDTurn(45, 1, a, g, temp); // first pedestal
   irTurn(0.5);
+  */
 
   /*PIDDrive(20, 0.30, false, a, g, temp);
   PIDTurn(90, 1, a, g, temp); //first pedestal
@@ -135,8 +144,7 @@ void loop()
   while (1)
   {
     displayMenu(display2);
-    // displayInfoScreen(display1);
-    printReflectance();
+    displayInfoScreen(display1);
   }
 }
 

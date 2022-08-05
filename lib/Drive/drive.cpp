@@ -56,7 +56,7 @@ void driveMotor(PinName fowardPin, PinName reversePin, float power)
  * @brief PID code using turning, setpoint is in degrees where + is CCW
  *
  * @param setPoint target angle
- * @param dir direction to turn, either +1 (left side) or 0 (right side)
+ * @param dir direction to turn, either +1 (left side --> CW) or 0 (right side --> CCW)
  * @param accel acceleration sensor event (xyz acceleration)
  * @param gyro gyro sensor event (xyz rotational velocity)
  * @param temp temperature sensor event
@@ -68,7 +68,7 @@ void PIDTurn(float setPoint, int dir, sensors_event_t accel, sensors_event_t gyr
   float iSat = 100;
   float error, prevError, errorSum = 0;
   float power;
-  //resetGyro();
+  // resetGyro();
   int gyCo = 0;
   while (gyCo < 13)
   {
@@ -111,16 +111,18 @@ void PIDTurn(float setPoint, int dir, sensors_event_t accel, sensors_event_t gyr
 }
 
 /**
- * @brief PID drive with setpoint in centimeters, + is forward and - is backward
+ * @brief PID drive with dist in centimeters, + is forward and - is backward
  *
  * @param dist target distance
+ * @param satDr saturation value for drive (maximum drive power)
+ * @param useIR determines if the IR sensors should be used for angle correction
  * @param accel acceleration sensor event (xyz acceleration)
  * @param gyro gyro sensor event (xyz rotational velocity)
  * @param temp temperature sensor event
  * @return None
  */
 void PIDDrive(float dist, float satDr, bool useIR, sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp)
-{ 
+{
   float iSat = 100;
   int error, prevError, errorSum = 0;
   float turnError, turnSet, turnPrevError = 0;
@@ -163,12 +165,14 @@ void PIDDrive(float dist, float satDr, bool useIR, sensors_event_t accel, sensor
     prevError = error;
     delay(5);
 
-    //Calculate Angle Correction Error
-    if(!useIR){
-       turnPower = (turnError * P_TURN_DRIVE);
-       turnPower += (turnError - turnPrevError) * D_TURN_DRIVE;
+    // Calculate Angle Correction Error
+    if (!useIR)
+    {
+      turnPower = (turnError * P_TURN_DRIVE);
+      turnPower += (turnError - turnPrevError) * D_TURN_DRIVE;
     }
-    else{
+    else
+    {
       turnPower = (goertzel(IR_PIN1, 10, 4) * 1.1 - goertzel(IR_PIN2, 10, 4)) * pIR;
     }
 
@@ -266,7 +270,8 @@ void irTurn(float sat)
   int irCount = 0;
   float power, error, prevError;
   int threshold = 0.001;
-  while(irCount < 100){
+  while (irCount < 100)
+  {
     error = goertzel(IR_PIN1, 10, 4) - goertzel(IR_PIN2, 10, 4);
     power = error * -pTurnIR;
     power += (error - prevError) * -dTurnIR;
@@ -313,7 +318,8 @@ void setPIR(int val)
  * @param val value to put into pTurnIR
  * @return None
  */
-void setPTurnIR(int val) {
+void setPTurnIR(int val)
+{
   pTurnIR = val;
   EEPROM.put(PID_PTURNIR_ADDR, pTurnIR);
 }
@@ -324,7 +330,8 @@ void setPTurnIR(int val) {
  * @param val value to put into dTurnIR
  * @return None
  */
-void setDTurnIR(int val){
+void setDTurnIR(int val)
+{
   dTurnIR = val;
   EEPROM.put(PID_DTURNIR_ADDR, dTurnIR);
 }

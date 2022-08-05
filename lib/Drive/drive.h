@@ -20,7 +20,7 @@
 // Constants
 #define P_TURN 0.8
 #define I_TURN 0.01
-#define D_TURN 2
+#define D_TURN 1.9
 #define P_DRIVE 0.05
 #define I_DRIVE 0.000
 #define D_DRIVE 0.1
@@ -45,7 +45,7 @@ extern int dTurnIR;
 
 void driveMotor(PinName fowardPin, PinName reversePin, float power);
 void PIDTurn(float setPoint, int dir, sensors_event_t a, sensors_event_t g, sensors_event_t temp);
-void PIDDrive(float setPoint, float sat, bool useIR, sensors_event_t a, sensors_event_t g, sensors_event_t temp);
+void PIDDrive(float dist, float satDr, bool useIR, sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp);
 void encCount();
 void driveSetup();
 void printDrive(float power, int error, int errorSum, int prevError);
