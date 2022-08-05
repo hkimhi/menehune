@@ -21,8 +21,9 @@ extern bool hasSeenBomb;
 void printIntake();
 void onHit();
 void onDetectBomb();
-void resetClaw();
+void prepareClaw();
+void unprepareClaw();
 void setClosedPosition(int);
-bool isBumper();
+bool getBumperState();
 
 #endif

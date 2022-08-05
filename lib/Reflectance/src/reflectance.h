@@ -1,7 +1,7 @@
 #ifndef REFLECTANCE_H
 #define REFLECTANCE_H
 
-#include <Arduino.h>
+// #include <Arduino.h>
 #include <Adafruit_SSD1306.h>
 
 // PIN I/O

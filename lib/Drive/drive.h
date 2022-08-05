@@ -7,6 +7,9 @@
 #include <gyro.h>
 #include <ir_sensor.h>
 #include <math.h>
+#include "intake.h"
+#include "reflectance.h"
+
 // Pin I/O
 #define LEFT_FOWARD PA_7   // Left side drive, forward direction
 #define LEFT_REVERSE PB_0  // Left side drive, reverse direction
@@ -48,10 +51,9 @@ void PIDTurn(float setPoint, int dir, sensors_event_t a, sensors_event_t g, sens
 void PIDDrive(float dist, float satDr, bool useIR, sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp);
 void encCount();
 void driveSetup();
-void printDrive(float power, int error, int errorSum, int prevError);
-void printDrive(float power, int error, int errorSum, int prevError, int timeout);
 float clip(float in, float low, float high);
 void irTurn(float sat);
+void alignRightCliff(int forwardPower);
 
 void setTurnSat(float);
 void setPIR(int);

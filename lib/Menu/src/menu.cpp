@@ -30,7 +30,12 @@ Option::Option(String name, float val, float maxVal, void (*func)(float))
 }
 
 // Globals
-Item items[NUM_MENU_ITEMS] = {Item("default1", std::vector<Option>()), Item("default2", std::vector<Option>()), Item("default3", std::vector<Option>())};
+Item items[NUM_MENU_ITEMS] = {
+    Item("default1", std::vector<Option>()),
+    Item("default2", std::vector<Option>()),
+    Item("default3", std::vector<Option>()),
+    Item("default4", std::vector<Option>())
+};
 
 void initializeMenu()
 {
@@ -43,13 +48,15 @@ void initializeMenu()
     extern int pTurnIR;
     extern int dTurnIR;
 
+    std::vector<Option> enableOptions{Option("enable robot", shouldStart, 2, setStart)};
     std::vector<Option> reflectanceOptions{Option("cliff ref", referenceOneDutyCycle, 255, setReflectanceOneReference), Option("line ref", referenceTwoDutyCycle, 255, setReflectanceTwoReference)};
     std::vector<Option> driveOptions{Option("turnSat", turnSat, 1.0, setTurnSat), Option("pIR", pIR, 100, setPIR), Option("pTurnIR", pTurnIR, 1024, setPTurnIR), Option("dTurnIR", dTurnIR, 1024, setDTurnIR)};
     std::vector<Option> intakeOptions{Option("closed position", intakeServoClosedPosition, 180, setClosedPosition)};
 
-    items[0] = Item("Reflect", reflectanceOptions);
-    items[1] = Item("Drive", driveOptions);
+    items[0] = Item("Enable", enableOptions);
+    items[1] = Item("Reflect", reflectanceOptions);
     items[2] = Item("Intake", intakeOptions);
+    items[3] = Item("Drive", driveOptions);
 }
 
 int selectedItem = 0;

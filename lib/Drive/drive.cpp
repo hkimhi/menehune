@@ -13,6 +13,10 @@ volatile float counter = 0;
 volatile int ij = 0;
 bool drive = false;
 
+// Function Declarations
+void printDrive(float power, int error, int errorSum, int prevError);
+void printDrive(float power, int error, int errorSum, int prevError, int timeout);
+
 /**
  * @brief Initializes the drivetrain
  *
@@ -125,17 +129,17 @@ void PIDDrive(float dist, float satDr, bool useIR, sensors_event_t accel, sensor
 {
   float iSat = 100;
   int error, prevError, errorSum = 0;
-  float turnError, turnSet, turnPrevError = 0;
+  float turnError, turnPrevError = 0;
   float power, turnPower;
   int start = counter;
   int timeout = 0;
   drive = true;
   float setPoint = (dist / (6.28 * 3.5)) * 48;
   readGyro(accel, gyro, temp);
-  turnSet = z;
+  float turnSet = z;
   driveMotor(LEFT_FOWARD, LEFT_REVERSE, copysign(satDr, dist));
   driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, copysign(satDr, dist));
-  while ((timeout < 25))
+  while (timeout < 30)
   {
 
     readGyro(accel, gyro, temp);
@@ -265,6 +269,12 @@ float clip(float in, float low, float high)
     return in;
 }
 
+/**
+ * @brief Turn to face IR beacon
+ *
+ * @param sat saturated (maximum) allowed power to use
+ * @return None
+ */
 void irTurn(float sat)
 {
   int irCount = 0;
@@ -334,4 +344,31 @@ void setDTurnIR(int val)
 {
   dTurnIR = val;
   EEPROM.put(PID_DTURNIR_ADDR, dTurnIR);
+}
+
+void alignRightCliff(int forwardPower) {
+  // while loop to drive along right cliff edge towards the pedestal until we hit the pedestal with the bumper
+  while (getBumperState())
+  {
+    // while front bumper hasn't hit anything (i.e. until we hit the second pedestal)
+    while (!digitalRead(REFLECTANCE_ONE) && getBumperState())
+    {
+      // drive until right wing detecting cliff
+      driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, forwardPower);
+      driveMotor(LEFT_FOWARD, LEFT_REVERSE, forwardPower);
+    }
+
+    while (digitalRead(REFLECTANCE_ONE) && getBumperState())
+    {
+      // turn until right wing not detecting cliff
+      driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.15);
+      driveMotor(LEFT_FOWARD, LEFT_REVERSE, -0.8);
+    }
+
+    delay(15);
+    intakeEnabled = true;
+    prepareClaw();
+  }
+  driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0);
+  driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0);
 }

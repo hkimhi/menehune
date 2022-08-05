@@ -59,25 +59,45 @@ void onDetectBomb()
 }
 
 /**
- * @brief Resets the intake claw by moving it to the open position and setting the currentlySeesBomb flag to false
+ * @brief Prepares the claw for the next podium by enabling intake and setting currentlySeesBomb to false
  *
  * @return None
  */
-void resetClaw()
+void prepareClaw()
 {
-  if (intakeEnabled)
-  {
-    intakeServo.write(INTAKE_SERVO_OPEN_POS);
-    currentlySeesBomb = false;
-  }
+  intakeEnabled = true;
+  currentlySeesBomb = false;
 }
 
+/**
+ * @brief Unprepares the claw for safe transport by closing the claw and disabling intake functionality
+ *
+ * @return None
+ */
+void unprepareClaw()
+{
+  intakeServo.write(intakeServoClosedPosition);
+  intakeEnabled = false;
+}
+
+/**
+ * @brief Set the closed position for the intake servo
+ *
+ * @param closedPosition
+ */
 void setClosedPosition(int closedPosition)
 {
   EEPROM.put(SERVO_CLOSED_POS_ADDR, closedPosition);
   intakeServoClosedPosition = closedPosition;
 }
 
-bool isBumper(){
+/**
+ * @brief Returns the state of the bumper switch
+ *
+ * @return true - if bumper is NOT hitting anything
+ * @return false  - if bumper has hit something
+ */
+bool getBumperState()
+{
   return digitalRead(BUMPER_SWITCH);
 }

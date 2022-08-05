@@ -1,5 +1,7 @@
 #include "utils.h"
 
+int shouldStart = 0;
+
 /**
  * @brief Provides functionality like the standard map() function but for floats
  * 
@@ -13,4 +15,14 @@
 float mapf(float input, float inFrom, float inTo, float outFrom, float outTo) {
     float f = (input - inFrom) / (inTo - inFrom) * (outTo - outFrom) + outFrom;
     return f;
+}
+
+/**
+ * @brief Determines if globally the robot should go or not
+ * 
+ * @param val the value to set shouldStart to (1 for true, 0 for false)
+ * @return None
+ */
+void setStart(int val) {
+    shouldStart = val;
 }

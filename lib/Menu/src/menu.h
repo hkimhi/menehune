@@ -16,7 +16,7 @@
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
 #define OLED_RESET -1    // This display does not have a reset pin accessible
 
-#define NUM_MENU_ITEMS 3
+#define NUM_MENU_ITEMS 4
 #define NUM_MAX_OPTIONS 4
 
 // Function Declarations
