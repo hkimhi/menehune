@@ -154,7 +154,8 @@ void loop()
   PIDTurn(0, 0, a, g, temp);
   PIDDrive(20, 0.42, false, a, g, temp); 
   resetGyro();
-  PIDTurn(45, 0, a, g, temp);
+  PIDTurn(22.5, 1, a, g, temp);
+  PIDTurn(22.5, 0, a, g, temp);
   PIDDrive(-20, 0.42, false, a, g, temp); 
   
   //irTurn(0.5);
