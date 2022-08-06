@@ -82,7 +82,7 @@ void displayMenu(Adafruit_SSD1306 display)
 
         selectedOption += 1;
     }
-    else if (y < 256)
+    else if (y < 200)
     {
         // up
         selectedItem -= 1;

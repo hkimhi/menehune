@@ -107,9 +107,9 @@ void loop()
   PIDDrive(28, 0.42, false, a, g, temp); // drive forward about to the surface edge
   PIDTurn(35, 1, a, g, temp);            // rotate CCW
   prepareClaw();
-  PIDDrive(40, 0.45, false, a, g, temp); // drive forward about to the surface edge
+  PIDDrive(44, 0.47, false, a, g, temp); // drive forward about to the surface edge
 
-  alignRightCliff(0.38, 0.38, 1);
+  alignRightCliff(0.47, 0.38, 1);
 
 
   onHit(); // closes claw manually for second treasure (if not bomb)
@@ -121,15 +121,15 @@ void loop()
 
   // Get through arch with series of slight forward drives and turns
   PIDTurn(22.5, 0, a, g, temp);
-  PIDDrive(26, 0.40, false, a, g, temp);
+  PIDDrive(30, 0.39, false, a, g, temp);
   PIDTurn(30, 1, a, g, temp);
   PIDDrive(5, 0.42, false, a, g, temp);
   PIDTurn(35, 1, a, g, temp);
-  PIDDrive(5, 0.42, false, a, g, temp);
+  PIDDrive(3, 0.42, false, a, g, temp);
   PIDTurn(40, 1, a, g, temp);
-  PIDDrive(5, 0.42, false, a, g, temp);
+  PIDDrive(3, 0.42, false, a, g, temp);
   PIDTurn(45, 1, a, g, temp);
-  PIDDrive(59, 0.42, false, a, g, temp);
+  PIDDrive(48, 0.42, false, a, g, temp);
 
   //irTurn(0.5); // face IR beacon
   resetGyro();
@@ -138,10 +138,21 @@ void loop()
   delay(500);
   PIDDrive(20, 0.34, false, a, g, temp); // drive at third pedestal
   onHit();
-  PIDDrive(-20, 0.34, false, a, g, temp);
+  PIDDrive(-20, 0.42, false, a, g, temp);
   unprepareClaw();
   PIDTurn(0, 1, a, g, temp);
-  PIDDrive(50, 0.43, false, a,g,temp);
+  PIDDrive(75, 0.43, false, a,g,temp);
+  PIDTurn(-45, 0, a, g, temp);
+  PIDDrive(-10, 0.42, false, a, g, temp);
+  prepareClaw();
+  delay(750);
+  PIDDrive(35, 0.34, false, a, g, temp); // drive at third pedestal
+  onHit();
+  delay(500);
+  PIDDrive(-20, 0.42, false, a, g, temp);
+  unprepareClaw();
+  PIDTurn(0, 1, a, g, temp);
+  
   //irTurn(0.5);
 
   while (1) 
@@ -203,11 +214,11 @@ void alignRightCliff(float highPower, float lowPower, int iter) {
     while (digitalRead(REFLECTANCE_ONE) && getBumperState())
     {
       // turn until right wing not detecting cliff
-      driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.17);
-      driveMotor(LEFT_FOWARD, LEFT_REVERSE, -0.65);
+      driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, -0.2);
+      driveMotor(LEFT_FOWARD, LEFT_REVERSE, -0.7);
     }
 
-    delay(10);
+    delay(20);
     //intakeEnabled = true;
     prepareClaw();
   }
