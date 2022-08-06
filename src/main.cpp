@@ -93,7 +93,7 @@ void loop()
   calibrateGyro(a, g, temp);
   delay(300);
 
-  PIDDrive(173, 0.63, false, a, g, temp); // drive up starting ramp
+  PIDDrive(176, 0.63, false, a, g, temp); // drive up starting ramp
   resetGyro();
   PIDTurn(-17, 1, a, g, temp); // aim towards first pedestal (CW)
   prepareClaw();
@@ -109,7 +109,7 @@ void loop()
   prepareClaw();
   PIDDrive(44, 0.47, false, a, g, temp); // drive forward about to the surface edge
 
-  alignRightCliff(0.47, 0.38, 1);
+  alignRightCliff(0.6, 0.38, 3);
 
 
   onHit(); // closes claw manually for second treasure (if not bomb)
@@ -133,12 +133,12 @@ void loop()
 
   //irTurn(0.5); // face IR beacon
   resetGyro();
-  PIDTurn(45, 0, a, g, temp);          // turn towards third pedestal
+  PIDTurn(47, 0, a, g, temp);          // turn towards third pedestal
   prepareClaw();
   delay(500);
   PIDDrive(20, 0.34, false, a, g, temp); // drive at third pedestal
   onHit();
-  PIDDrive(-20, 0.42, false, a, g, temp);
+  PIDDrive(-20, 0.55, false, a, g, temp);
   unprepareClaw();
   PIDTurn(0, 1, a, g, temp);
   PIDDrive(75, 0.43, false, a,g,temp);
@@ -149,9 +149,13 @@ void loop()
   PIDDrive(35, 0.34, false, a, g, temp); // drive at third pedestal
   onHit();
   delay(500);
-  PIDDrive(-20, 0.42, false, a, g, temp);
+  PIDDrive(-20, 0.5, false, a, g, temp);
   unprepareClaw();
-  PIDTurn(0, 1, a, g, temp);
+  PIDTurn(0, 0, a, g, temp);
+  PIDDrive(20, 0.42, false, a, g, temp); 
+  resetGyro();
+  PIDTurn(45, 0, a, g, temp);
+  PIDDrive(-20, 0.42, false, a, g, temp); 
   
   //irTurn(0.5);
 

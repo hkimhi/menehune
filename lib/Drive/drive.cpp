@@ -74,7 +74,7 @@ void PIDTurn(float setPoint, int dir, sensors_event_t accel, sensors_event_t gyr
   float power;
   // resetGyro();
   int gyCo = 0;
-  while (gyCo < 13)
+  while (gyCo < 8)
   {
     readGyro(accel, gyro, temp);
     // printGyro();
