@@ -7,8 +7,6 @@
 #include <gyro.h>
 #include <ir_sensor.h>
 #include <math.h>
-#include "intake.h"
-#include "reflectance.h"
 
 // Pin I/O
 #define LEFT_FOWARD PA_7   // Left side drive, forward direction
@@ -19,18 +17,19 @@
 #define ENC_PIN2 PB13
 #define IR_PIN1 PA_1
 #define IR_PIN2 PA_0
+#define PWM_FREQ 500
 
 // Constants
 #define P_TURN 0.8
 #define I_TURN 0.01
 #define D_TURN 2
-#define P_DRIVE 0.05
+#define P_DRIVE 0.1
 #define I_DRIVE 0.000
 #define D_DRIVE 0.1
 #define FFT 0.27
 #define FFD 0.02
 #define LCOMP 1
-#define P_TURN_DRIVE 0.6
+#define P_TURN_DRIVE 0.8
 #define D_TURN_DRIVE 0.4
 extern volatile float counter;
 extern volatile int ij;
@@ -53,7 +52,6 @@ void encCount();
 void driveSetup();
 float clip(float in, float low, float high);
 void irTurn(float sat);
-void alignRightCliff(int forwardPower);
 
 void setTurnSat(float);
 void setPIR(int);

@@ -160,7 +160,8 @@ void displayInfoScreen(Adafruit_SSD1306 display)
     display.printf("switch: %i\n", digitalRead(JOYSTICK_SWITCH));
 
     display.printf("length: %i\n", EEPROM.length());
-
+    display.printf("IR");
+    display.print((goertzel(IR_PIN1, 10, 4) - goertzel(IR_PIN2, 10, 4)) * 100);
     display.display();
 }
 

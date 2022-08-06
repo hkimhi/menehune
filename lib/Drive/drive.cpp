@@ -41,18 +41,18 @@ void driveMotor(PinName fowardPin, PinName reversePin, float power)
 {
   if (power > 0)
   {
-    pwm_start(reversePin, 100, 0, TimerCompareFormat_t::RESOLUTION_16B_COMPARE_FORMAT);
-    pwm_start(fowardPin, 100, (int)(32768 * power), TimerCompareFormat_t::RESOLUTION_16B_COMPARE_FORMAT);
+    pwm_start(reversePin, PWM_FREQ, 0, TimerCompareFormat_t::RESOLUTION_16B_COMPARE_FORMAT);
+    pwm_start(fowardPin, PWM_FREQ, (int)(32768 * power), TimerCompareFormat_t::RESOLUTION_16B_COMPARE_FORMAT);
   }
   else if (power < 0)
   {
-    pwm_start(fowardPin, 100, 0, TimerCompareFormat_t::RESOLUTION_16B_COMPARE_FORMAT);
-    pwm_start(reversePin, 100, (int)(32768 * abs(power)), TimerCompareFormat_t::RESOLUTION_16B_COMPARE_FORMAT);
+    pwm_start(fowardPin, PWM_FREQ, 0, TimerCompareFormat_t::RESOLUTION_16B_COMPARE_FORMAT);
+    pwm_start(reversePin, PWM_FREQ, (int)(32768 * abs(power)), TimerCompareFormat_t::RESOLUTION_16B_COMPARE_FORMAT);
   }
   else
   {
-    pwm_start(reversePin, 100, 0, TimerCompareFormat_t::RESOLUTION_16B_COMPARE_FORMAT);
-    pwm_start(fowardPin, 100, 0, TimerCompareFormat_t::RESOLUTION_16B_COMPARE_FORMAT);
+    pwm_start(reversePin, PWM_FREQ, 0, TimerCompareFormat_t::RESOLUTION_16B_COMPARE_FORMAT);
+    pwm_start(fowardPin, PWM_FREQ, 0, TimerCompareFormat_t::RESOLUTION_16B_COMPARE_FORMAT);
   }
 }
 
@@ -68,7 +68,7 @@ void driveMotor(PinName fowardPin, PinName reversePin, float power)
  */
 void PIDTurn(float setPoint, int dir, sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp)
 {
-  float turnSat = 0.79;
+  float turnSat = 0.82;
   float iSat = 100;
   float error, prevError, errorSum = 0;
   float power;
@@ -344,31 +344,4 @@ void setDTurnIR(int val)
 {
   dTurnIR = val;
   EEPROM.put(PID_DTURNIR_ADDR, dTurnIR);
-}
-
-void alignRightCliff(int forwardPower) {
-  // while loop to drive along right cliff edge towards the pedestal until we hit the pedestal with the bumper
-  while (getBumperState())
-  {
-    // while front bumper hasn't hit anything (i.e. until we hit the second pedestal)
-    while (!digitalRead(REFLECTANCE_ONE) && getBumperState())
-    {
-      // drive until right wing detecting cliff
-      driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, forwardPower);
-      driveMotor(LEFT_FOWARD, LEFT_REVERSE, forwardPower);
-    }
-
-    while (digitalRead(REFLECTANCE_ONE) && getBumperState())
-    {
-      // turn until right wing not detecting cliff
-      driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.15);
-      driveMotor(LEFT_FOWARD, LEFT_REVERSE, -0.8);
-    }
-
-    delay(15);
-    intakeEnabled = true;
-    prepareClaw();
-  }
-  driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0);
-  driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0);
 }

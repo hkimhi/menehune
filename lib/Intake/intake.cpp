@@ -65,6 +65,7 @@ void onDetectBomb()
  */
 void prepareClaw()
 {
+  intakeServo.write(INTAKE_SERVO_OPEN_POS);
   intakeEnabled = true;
   currentlySeesBomb = false;
 }
