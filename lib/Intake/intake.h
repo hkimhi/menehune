@@ -5,7 +5,6 @@
 #include <Adafruit_SSD1306.h>
 
 // PIN I/O
-#define SERVO_POS_POT PB1  // Potentiometer to control servo closed position
 #define SERVO PA8          // Pin for servo controlling intake claw
 #define BUMPER_SWITCH PB15 // Front bumper for hitting pedestal
 #define HALL_INPUT PB14    // Hall effect sensors to detect magnet
