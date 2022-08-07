@@ -2,7 +2,6 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_SSD1306.h>
 #include <Wire.h>
-#include <Servo.h>
 #include <EEPROM.h>
 #include "drive.h"
 #include "gyro.h"
@@ -24,14 +23,12 @@ Adafruit_SSD1306 display1(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 Adafruit_SSD1306 display2(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 extern int intakeServoClosedPosition;
-Servos intakeServo = Servos();
-//Servos intakeServo = Servos(int(SERVO));
+Servos intakeServo = Servos(INTAKE_SERVO);
 
 // FUNCTION DECLARATION //
 void putEEPROMDefaults();
 void getEEPROMVals();
 void alignRightCliff(float highPower, float lowPower, int iter);
-
 
 // GLOBAL VARIABLES //
 sensors_event_t a;    // acceleration sensor event
@@ -59,8 +56,6 @@ void setup(void)
 
   pinMode(BUMPER_SWITCH, INPUT_PULLUP);
   pinMode(HALL_INPUT, INPUT_PULLUP);
-  // intakeServo.attach(SERVO);
-  intakeServo.initialize(int(SERVO));
   intakeServo.write(intakeServoClosedPosition);
   display1.begin(SSD1306_SWITCHCAPVCC, 0x3C);
   display2.begin(SSD1306_SWITCHCAPVCC, 0x3D);
@@ -96,6 +91,9 @@ void loop()
   calibrateGyro(a, g, temp);
   delay(300);
 
+  driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.4);
+  driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0.4);
+
   PIDDrive(176, 0.63, false, a, g, temp); // drive up starting ramp
   resetGyro();
   PIDTurn(-17, 1, a, g, temp); // aim towards first pedestal (CW)
@@ -113,7 +111,6 @@ void loop()
   PIDDrive(44, 0.47, false, a, g, temp); // drive forward about to the surface edge
 
   alignRightCliff(0.6, 0.38, 3);
-
 
   onHit(); // closes claw manually for second treasure (if not bomb)
   delay(1000);
@@ -134,9 +131,9 @@ void loop()
   PIDTurn(45, 1, a, g, temp);
   PIDDrive(48, 0.42, false, a, g, temp);
 
-  //irTurn(0.5); // face IR beacon
+  // irTurn(0.5); // face IR beacon
   resetGyro();
-  PIDTurn(47, 0, a, g, temp);          // turn towards third pedestal
+  PIDTurn(47, 0, a, g, temp); // turn towards third pedestal
   prepareClaw();
   delay(500);
   PIDDrive(20, 0.34, false, a, g, temp); // drive at third pedestal
@@ -144,7 +141,7 @@ void loop()
   PIDDrive(-20, 0.55, false, a, g, temp);
   unprepareClaw();
   PIDTurn(0, 1, a, g, temp);
-  PIDDrive(75, 0.43, false, a,g,temp);
+  PIDDrive(75, 0.43, false, a, g, temp);
   PIDTurn(-45, 0, a, g, temp);
   PIDDrive(-10, 0.42, false, a, g, temp);
   prepareClaw();
@@ -155,15 +152,15 @@ void loop()
   PIDDrive(-20, 0.5, false, a, g, temp);
   unprepareClaw();
   PIDTurn(0, 0, a, g, temp);
-  PIDDrive(20, 0.42, false, a, g, temp); 
+  PIDDrive(20, 0.42, false, a, g, temp);
   resetGyro();
   PIDTurn(22.5, 1, a, g, temp);
   PIDTurn(22.5, 0, a, g, temp);
-  PIDDrive(-20, 0.42, false, a, g, temp); 
-  
-  //irTurn(0.5);
+  PIDDrive(-20, 0.42, false, a, g, temp);
 
-  while (1) 
+  // irTurn(0.5);
+
+  while (1)
   {
     displayMenu(display2);
     // displayInfoScreen(display1);
@@ -199,7 +196,8 @@ void getEEPROMVals()
   EEPROM.get(PID_DTURNIR_ADDR, dTurnIR);
 }
 
-void alignRightCliff(float highPower, float lowPower, int iter) {
+void alignRightCliff(float highPower, float lowPower, int iter)
+{
   // while loop to drive along right cliff edge towards the pedestal until we hit the pedestal with the bumper
   int ledgeCount = 0;
   while (getBumperState())
@@ -209,11 +207,13 @@ void alignRightCliff(float highPower, float lowPower, int iter) {
     while (!digitalRead(REFLECTANCE_ONE) && getBumperState())
     {
       // drive until right wing detecting cliff
-      if(ledgeCount < iter){
+      if (ledgeCount < iter)
+      {
         driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, highPower);
         driveMotor(LEFT_FOWARD, LEFT_REVERSE, highPower);
       }
-      else{
+      else
+      {
         driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, lowPower);
         driveMotor(LEFT_FOWARD, LEFT_REVERSE, lowPower);
       }
@@ -227,7 +227,7 @@ void alignRightCliff(float highPower, float lowPower, int iter) {
     }
 
     delay(20);
-    //intakeEnabled = true;
+    // intakeEnabled = true;
     prepareClaw();
   }
   driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0);

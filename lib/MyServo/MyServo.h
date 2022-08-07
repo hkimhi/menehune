@@ -6,13 +6,12 @@
 class Servos
 {
 private:
-    int pin;
+    PinName pin;
     int angle;
-public:
-    Servos(int pin);
-    Servos();
 
-    void initialize(int pin);
+public:
+    Servos(PinName pin);
+
     void write(int angle);
     int read();
 };

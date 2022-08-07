@@ -1,11 +1,10 @@
 #include <Arduino.h>
-#include <Servo.h>
 #include <EEPROM.h>
 #include "intake.h"
 #include "MyServo.h"
 
 extern Adafruit_SSD1306 display1;
-Servos intakeServo;
+extern Servos intakeServo;
 int intakeServoClosedPosition = 140;
 
 bool intakeEnabled = false;
