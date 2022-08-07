@@ -93,7 +93,7 @@ void PIDTurn(float setPoint, int dir, sensors_event_t accel, sensors_event_t gyr
     // Save Prev values for derivative
     prevError = error;
     power = clip(power, -turnSat, turnSat);
-    if (abs(error + prevError) / 2 < 0.6)
+    if (abs(error + prevError) / 2 < 0.4)
     {
       gyCo++;
     }
@@ -139,7 +139,7 @@ void PIDDrive(float dist, float satDr, bool useIR, sensors_event_t accel, sensor
   float turnSet = z;
   driveMotor(LEFT_FOWARD, LEFT_REVERSE, copysign(satDr, dist));
   driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, copysign(satDr, dist));
-  while (timeout < 30)
+  while (timeout < 50)
   {
 
     readGyro(accel, gyro, temp);

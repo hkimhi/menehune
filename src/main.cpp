@@ -14,6 +14,7 @@
 // PIN I/O //
 #undef LED_BUILTIN
 #define LED_BUILTIN PB2
+#define BRIDGE_SERVO PB1
 
 // CONSTANTS //
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
@@ -27,13 +28,17 @@ extern int intakeServoClosedPosition;
 // FUNCTION DECLARATION //
 void putEEPROMDefaults();
 void getEEPROMVals();
-void alignRightCliff(float highPower, float lowPower, int iter);
+void alignRightCliff();
+void minDriveReverse();
+void minDrive(int dir);
 
 
 // GLOBAL VARIABLES //
 sensors_event_t a;    // acceleration sensor event
 sensors_event_t g;    // gyro sensor event
 sensors_event_t temp; // temperature sensor event
+
+Servo bridgeServo;
 
 void setup(void)
 {
@@ -59,6 +64,8 @@ void setup(void)
   pinMode(HALL_INPUT, INPUT_PULLUP);
   intakeServo.attach(SERVO);
   intakeServo.write(intakeServoClosedPosition);
+  bridgeServo.attach(BRIDGE_SERVO);
+  bridgeServo.write(0);
   display1.begin(SSD1306_SWITCHCAPVCC, 0x3C);
   display2.begin(SSD1306_SWITCHCAPVCC, 0x3D);
   attachInterrupt(digitalPinToInterrupt(BUMPER_SWITCH), onHit, FALLING);     // SWITCH_INPUT is regular high (Switches in parallel with internal pull-up)
@@ -78,88 +85,77 @@ void setup(void)
   display1.setCursor(0, 0);
   display1.println("MPU6050 Found!");
   display1.display();
+  
   delay(100);
 }
 
 void loop()
-{
-  while (shouldStart == 0)
-  {
-    displayMenu(display2);
-    displayInfoScreen(display1);
+{ 
+  while(1){
+     display1.clearDisplay();
+    display1.setTextSize(1);
+    display1.setTextColor(SSD1306_WHITE);
+    display1.setCursor(0, 0);
+    display1.println( goertzel(IR_PIN1, 100, 4));
+    display1.println( goertzel(IR_PIN2, 100, 4));
+    display1.display();
   }
+  driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0);
+  driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0);
+ 
   delay(500);
-  intakeServo.write(INTAKE_SERVO_OPEN_POS);
+  intakeServo.write(intakeServoClosedPosition);
   calibrateGyro(a, g, temp);
   delay(300);
 
-  PIDDrive(176, 0.63, false, a, g, temp); // drive up starting ramp
-  resetGyro();
-  PIDTurn(-17, 1, a, g, temp); // aim towards first pedestal (CW)
-  prepareClaw();
-  PIDDrive(16, 0.40, false, a, g, temp);  // drive at pedestal
-  delay(500);                             // pick up treasure
-  PIDDrive(-18, 0.45, false, a, g, temp); // reverse from pedestal
-  unprepareClaw();
-  PIDTurn(0, 1, a, g, temp); // turn away from pedestal (CCW)
+  PIDDrive(173, 0.63, false, a, g, temp); // drive up starting ramp
 
   resetGyro();
-  PIDDrive(28, 0.42, false, a, g, temp); // drive forward about to the surface edge
-  PIDTurn(35, 1, a, g, temp);            // rotate CCW
-  prepareClaw();
+  PIDDrive(20, 0.42, false, a, g, temp); // drive forward about to the surface edge
+  PIDTurn(37, 1, a, g, temp);            // rotate CCW
+  //prepareClaw();
   PIDDrive(44, 0.47, false, a, g, temp); // drive forward about to the surface edge
 
-  alignRightCliff(0.6, 0.38, 3);
+  alignRightCliff();
 
 
-  onHit(); // closes claw manually for second treasure (if not bomb)
+  // onHit(); // closes claw manually for second treasure (if not bomb)
   delay(1000);
   resetGyro();
   PIDDrive(-20, 0.42, false, a, g, temp); // drive backwards
   delay(500);
-  unprepareClaw();
+  // unprepareClaw();
 
   // Get through arch with series of slight forward drives and turns
   PIDTurn(22.5, 0, a, g, temp);
   PIDDrive(30, 0.39, false, a, g, temp);
   PIDTurn(30, 1, a, g, temp);
-  PIDDrive(5, 0.42, false, a, g, temp);
+  PIDDrive(5, 0.39, false, a, g, temp);
   PIDTurn(35, 1, a, g, temp);
-  PIDDrive(3, 0.42, false, a, g, temp);
+  PIDDrive(2, 0.39, false, a, g, temp);
   PIDTurn(40, 1, a, g, temp);
-  PIDDrive(3, 0.42, false, a, g, temp);
+  PIDDrive(1, 0.39, false, a, g, temp);
   PIDTurn(45, 1, a, g, temp);
   PIDDrive(48, 0.42, false, a, g, temp);
 
   //irTurn(0.5); // face IR beacon
   resetGyro();
-  PIDTurn(47, 0, a, g, temp);          // turn towards third pedestal
-  prepareClaw();
-  delay(500);
-  PIDDrive(20, 0.34, false, a, g, temp); // drive at third pedestal
-  onHit();
-  PIDDrive(-20, 0.55, false, a, g, temp);
-  unprepareClaw();
-  PIDTurn(0, 1, a, g, temp);
-  PIDDrive(75, 0.43, false, a,g,temp);
-  PIDTurn(-45, 0, a, g, temp);
-  PIDDrive(-10, 0.42, false, a, g, temp);
-  prepareClaw();
-  delay(750);
-  PIDDrive(35, 0.34, false, a, g, temp); // drive at third pedestal
-  onHit();
-  delay(500);
-  PIDDrive(-20, 0.5, false, a, g, temp);
-  unprepareClaw();
-  PIDTurn(0, 0, a, g, temp);
-  PIDDrive(20, 0.42, false, a, g, temp); 
-  resetGyro();
+ 
+  PIDDrive(110, 0.45, false, a,g, temp);
   PIDTurn(22.5, 1, a, g, temp);
-  PIDTurn(22.5, 0, a, g, temp);
-  PIDDrive(-20, 0.42, false, a, g, temp); 
-  
-  //irTurn(0.5);
+  PIDTurn(45, 0, a, g, temp);
+  minDriveReverse();
+  PIDDrive(5, 0.42, false, a, g, temp); 
 
+  bridgeServo.write(180);
+  delay(1000);
+  PIDDrive(15, 0.42, false, a, g, temp); 
+  PIDDrive(-75, 0.7, false, a, g, temp); 
+  delay(2000);
+  PIDTurn(88, 0, a, g, temp);
+  alignRightCliff();
+  //irTurn(0.5);
+  
   while (1) 
   {
     displayMenu(display2);
@@ -196,37 +192,65 @@ void getEEPROMVals()
   EEPROM.get(PID_DTURNIR_ADDR, dTurnIR);
 }
 
-void alignRightCliff(float highPower, float lowPower, int iter) {
+void alignRightCliff() {
   // while loop to drive along right cliff edge towards the pedestal until we hit the pedestal with the bumper
-  int ledgeCount = 0;
   while (getBumperState())
   {
-    ledgeCount++;
-    // while front bumper hasn't hit anything (i.e. until we hit the second pedestal)
-    while (!digitalRead(REFLECTANCE_ONE) && getBumperState())
-    {
-      // drive until right wing detecting cliff
-      if(ledgeCount < iter){
-        driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, highPower);
-        driveMotor(LEFT_FOWARD, LEFT_REVERSE, highPower);
-      }
-      else{
-        driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, lowPower);
-        driveMotor(LEFT_FOWARD, LEFT_REVERSE, lowPower);
-      }
-    }
-
+    minDrive(1);
+    delay(50);
     while (digitalRead(REFLECTANCE_ONE) && getBumperState())
     {
       // turn until right wing not detecting cliff
       driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, -0.2);
       driveMotor(LEFT_FOWARD, LEFT_REVERSE, -0.7);
     }
-
-    delay(20);
+    delay(8);
     //intakeEnabled = true;
     prepareClaw();
   }
   driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0);
   driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0);
+}
+
+void minDriveReverse(){  
+  int enc, prevEnc = counter;
+  int powerInc = 0;
+  while(!digitalRead(REFLECTANCE_THREE)){
+    enc = counter;
+    if(abs(enc - prevEnc) < 1){
+      powerInc++;
+    }
+    else{
+      powerInc = powerInc - 3;
+    }
+    prevEnc = enc;
+    driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, -powerInc / 1024.0);
+    driveMotor(LEFT_FOWARD, LEFT_REVERSE, -powerInc / 1024.0);
+    delay(10);
+  }
+  driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.2);
+  driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0.2);
+  delay(100);
+  driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.0);
+  driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0.0);
+}
+
+void minDrive(int dir){  
+  int enc, prevEnc = counter;
+  int powerInc = 0;
+  while(!digitalRead(REFLECTANCE_ONE) && getBumperState()){
+    enc = counter;
+    if(abs(enc - prevEnc) < 1){
+      powerInc++;
+    }
+    else{
+      powerInc = powerInc  - 2;
+    }
+    prevEnc = enc;
+    driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, powerInc / 128.0 * dir);
+    driveMotor(LEFT_FOWARD, LEFT_REVERSE, powerInc / 128.0 * dir);
+    delay(10);
+  }
+  driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.0);
+  driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0.0);
 }
