@@ -74,6 +74,7 @@ void PIDTurn(float setPoint, int dir, sensors_event_t accel, sensors_event_t gyr
   float power;
   // resetGyro();
   int gyCo = 0;
+  resetTimer();
   while (gyCo < 8)
   {
     readGyro(accel, gyro, temp);
@@ -93,7 +94,7 @@ void PIDTurn(float setPoint, int dir, sensors_event_t accel, sensors_event_t gyr
     // Save Prev values for derivative
     prevError = error;
     power = clip(power, -turnSat, turnSat);
-    if (abs(error + prevError) / 2 < 0.4)
+    if (abs(error + prevError) / 2 < 0.3)
     {
       gyCo++;
     }
@@ -139,6 +140,7 @@ void PIDDrive(float dist, float satDr, bool useIR, sensors_event_t accel, sensor
   float turnSet = z;
   driveMotor(LEFT_FOWARD, LEFT_REVERSE, copysign(satDr, dist));
   driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, copysign(satDr, dist));
+  resetTimer();
   while (timeout < 30)
   {
 
@@ -162,7 +164,7 @@ void PIDDrive(float dist, float satDr, bool useIR, sensors_event_t accel, sensor
 
     power = clip(power, -satDr, satDr);
 
-    if ((prevError == error) || abs(error + prevError) <= 2)
+    if ((prevError == error) || (abs(error + prevError) <= 2 && (turnError < 1)))
     {
       timeout++;
     }
@@ -285,7 +287,7 @@ void irTurn(float sat)
   int threshold = 0.001;
   while (irCount < 25)
   {
-    error = goertzel(IR_PIN1, 25, 4) - goertzel(IR_PIN2, 25, 4);
+    error = goertzel(IR_PIN1, 25, 8) - goertzel(IR_PIN2, 25, 8);
     errorInt += error;
     power = error * -pTurnIR;
     power += (error - prevError) * -dTurnIR;

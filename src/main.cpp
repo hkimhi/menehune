@@ -91,17 +91,8 @@ void setup(void)
 
 void loop()
 { 
-  // while (1)
-  // {
-  //   display1.clearDisplay();
-  //   display1.setTextSize(1);
-  //   display1.setTextColor(SSD1306_WHITE);
-  //   display1.setCursor(0, 0);
-  //   display1.println(goertzel(IR_PIN1, 25, 8) - goertzel(IR_PIN2, 25, 8));
-  //   display1.println(goertzel(IR_PIN1, 25, 8));
-  //   display1.println(goertzel(IR_PIN2, 25, 8));
-  //   display1.display();
-  // }
+  calibrateGyro(a,g,temp);
+  resetTimer();
   
   driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0);
   driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0);
@@ -115,9 +106,10 @@ void loop()
 
   resetGyro();
   PIDDrive(18, 0.42, false, a, g, temp); // drive forward about to the surface edge
-  PIDTurn(45, 0, a, g, temp);            // rotate CCW
-  PIDDrive(33, 0.42, false, a, g, temp); // drive forward about to the surface edge
-  PIDTurn(37, 1, a, g, temp);            // rotate CCW
+  PIDTurn(40, 0, a, g, temp);            // rotate CCW
+  PIDTurn(90, 1, a, g, temp);            // rotate CCW
+  PIDDrive(40, 0.42, false, a, g, temp); // drive forward about to the surface edge
+  PIDTurn(70, 1, a, g, temp);            // rotate CCW
 
 
             // rotate CCW
@@ -133,25 +125,25 @@ void loop()
   // unprepareClaw();
 
   // Get through arch with series of slight forward drives and turns
-  PIDTurn(22.5, 0, a, g, temp);
+  PIDTurn(45, 0, a, g, temp);
   PIDDrive(30, 0.39, false, a, g, temp);
-  PIDTurn(30, 1, a, g, temp);
+  PIDTurn(60, 1, a, g, temp);
   PIDDrive(5, 0.39, false, a, g, temp);
-  PIDTurn(35, 1, a, g, temp);
+  PIDTurn(70, 1, a, g, temp);
   PIDDrive(2, 0.39, false, a, g, temp);
-  PIDTurn(40, 1, a, g, temp);
+  PIDTurn(80, 1, a, g, temp);
   PIDDrive(1, 0.39, false, a, g, temp);
-  PIDTurn(45, 1, a, g, temp);
-  irTurn(0.7);
+  PIDTurn(90, 1, a, g, temp);
+  //irTurn(0.7);
   PIDDrive(48, 0.42, false, a, g, temp);
 
   //irTurn(0.5); // face IR beacon
   resetGyro();
  
   PIDDrive(110, 0.45, false, a,g, temp);
-  PIDTurn(17.5, 1, a, g, temp);
+  PIDTurn(35, 1, a, g, temp);
   PIDDrive(10, 0.42, false, a, g, temp); 
-  PIDTurn(45, 0, a, g, temp);
+  PIDTurn(90, 0, a, g, temp);
   minDriveReverse();
   PIDDrive(5, 0.42, false, a, g, temp); 
 

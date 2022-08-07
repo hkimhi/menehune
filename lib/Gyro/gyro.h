@@ -6,7 +6,7 @@
 #include <Adafruit_Sensor.h>
 
 #define MIN_GYRO 0.01
-#define CONV 45/50 * 45/40
+#define CONV 180 / 3.14
 
 extern float xOff, yOff, zOff; // offsets for x, y, z positions
 extern volatile float x, y, z; // will store value of x, y, z positions
@@ -15,5 +15,6 @@ void readGyro(sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp)
 void calibrateGyro(sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp);
 void resetGyro();
 void printGyro();
+void resetTimer();
 
 #endif
