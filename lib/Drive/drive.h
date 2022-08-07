@@ -26,7 +26,7 @@
 #define P_DRIVE 0.25
 #define I_DRIVE 0.000
 #define D_DRIVE 0.25
-#define FFT 0.36
+#define FFT 0.4
 #define FFD 0.02
 #define LCOMP 1
 #define P_TURN_DRIVE 0.8

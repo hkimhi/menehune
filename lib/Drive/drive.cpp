@@ -139,7 +139,7 @@ void PIDDrive(float dist, float satDr, bool useIR, sensors_event_t accel, sensor
   float turnSet = z;
   driveMotor(LEFT_FOWARD, LEFT_REVERSE, copysign(satDr, dist));
   driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, copysign(satDr, dist));
-  while (timeout < 50)
+  while (timeout < 30)
   {
 
     readGyro(accel, gyro, temp);
@@ -278,13 +278,18 @@ float clip(float in, float low, float high)
 void irTurn(float sat)
 {
   int irCount = 0;
-  float power, error, prevError;
+  float power, error, prevError, errorInt = 0;
+  float iTurnIr = 12;
+  pTurnIR = 125;
+  dTurnIR = 1;
   int threshold = 0.001;
-  while (irCount < 100)
+  while (irCount < 25)
   {
-    error = goertzel(IR_PIN1, 10, 4) - goertzel(IR_PIN2, 10, 4);
+    error = goertzel(IR_PIN1, 25, 4) - goertzel(IR_PIN2, 25, 4);
+    errorInt += error;
     power = error * -pTurnIR;
     power += (error - prevError) * -dTurnIR;
+    power += errorInt * -iTurnIr;
     prevError = error;
     power = clip(power, -sat, sat);
     driveMotor(LEFT_FOWARD, LEFT_REVERSE, -power);

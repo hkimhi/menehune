@@ -10,7 +10,7 @@
  */
 float goertzel(int pin, int iter, int k)
 {
-  int n = 14;
+  int n = 28;
   float r, i = 0;
   float w = 2.0 * 3.14 * k / n;
   float coeff = 2 * cos(w);

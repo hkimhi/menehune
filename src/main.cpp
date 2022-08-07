@@ -91,15 +91,18 @@ void setup(void)
 
 void loop()
 { 
-  while(1){
-     display1.clearDisplay();
-    display1.setTextSize(1);
-    display1.setTextColor(SSD1306_WHITE);
-    display1.setCursor(0, 0);
-    display1.println( goertzel(IR_PIN1, 100, 4));
-    display1.println( goertzel(IR_PIN2, 100, 4));
-    display1.display();
-  }
+  // while (1)
+  // {
+  //   display1.clearDisplay();
+  //   display1.setTextSize(1);
+  //   display1.setTextColor(SSD1306_WHITE);
+  //   display1.setCursor(0, 0);
+  //   display1.println(goertzel(IR_PIN1, 25, 8) - goertzel(IR_PIN2, 25, 8));
+  //   display1.println(goertzel(IR_PIN1, 25, 8));
+  //   display1.println(goertzel(IR_PIN2, 25, 8));
+  //   display1.display();
+  // }
+  
   driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0);
   driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0);
  
@@ -111,10 +114,13 @@ void loop()
   PIDDrive(173, 0.63, false, a, g, temp); // drive up starting ramp
 
   resetGyro();
-  PIDDrive(20, 0.42, false, a, g, temp); // drive forward about to the surface edge
+  PIDDrive(18, 0.42, false, a, g, temp); // drive forward about to the surface edge
+  PIDTurn(45, 0, a, g, temp);            // rotate CCW
+  PIDDrive(33, 0.42, false, a, g, temp); // drive forward about to the surface edge
   PIDTurn(37, 1, a, g, temp);            // rotate CCW
-  //prepareClaw();
-  PIDDrive(44, 0.47, false, a, g, temp); // drive forward about to the surface edge
+
+
+            // rotate CCW
 
   alignRightCliff();
 
@@ -136,13 +142,15 @@ void loop()
   PIDTurn(40, 1, a, g, temp);
   PIDDrive(1, 0.39, false, a, g, temp);
   PIDTurn(45, 1, a, g, temp);
+  irTurn(0.7);
   PIDDrive(48, 0.42, false, a, g, temp);
 
   //irTurn(0.5); // face IR beacon
   resetGyro();
  
   PIDDrive(110, 0.45, false, a,g, temp);
-  PIDTurn(22.5, 1, a, g, temp);
+  PIDTurn(17.5, 1, a, g, temp);
+  PIDDrive(10, 0.42, false, a, g, temp); 
   PIDTurn(45, 0, a, g, temp);
   minDriveReverse();
   PIDDrive(5, 0.42, false, a, g, temp); 
@@ -196,15 +204,20 @@ void alignRightCliff() {
   // while loop to drive along right cliff edge towards the pedestal until we hit the pedestal with the bumper
   while (getBumperState())
   {
-    minDrive(1);
-    delay(50);
+    while (!digitalRead(REFLECTANCE_ONE) && getBumperState())
+    {
+      // turn until right wing not detecting cliff
+      driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.42);
+      driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0.42);
+    }
+    delay(20);
     while (digitalRead(REFLECTANCE_ONE) && getBumperState())
     {
       // turn until right wing not detecting cliff
       driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, -0.2);
       driveMotor(LEFT_FOWARD, LEFT_REVERSE, -0.7);
     }
-    delay(8);
+    delay(10);
     //intakeEnabled = true;
     prepareClaw();
   }
