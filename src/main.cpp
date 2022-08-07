@@ -10,6 +10,7 @@
 #include "reflectance.h"
 #include "menu.h"
 #include "utils.h"
+#include "MyServo.h"
 
 // PIN I/O //
 #undef LED_BUILTIN
@@ -23,6 +24,8 @@ Adafruit_SSD1306 display1(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 Adafruit_SSD1306 display2(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 extern int intakeServoClosedPosition;
+Servos intakeServo = Servos();
+//Servos intakeServo = Servos(int(SERVO));
 
 // FUNCTION DECLARATION //
 void putEEPROMDefaults();
@@ -54,10 +57,10 @@ void setup(void)
   pinMode(REFLECTANCE_FIVE, INPUT_PULLUP);
   pinMode(REFLECTANCE_SIX, INPUT_PULLUP);
 
-  pinMode(SERVO_POS_POT, INPUT_ANALOG);
   pinMode(BUMPER_SWITCH, INPUT_PULLUP);
   pinMode(HALL_INPUT, INPUT_PULLUP);
-  intakeServo.attach(SERVO);
+  // intakeServo.attach(SERVO);
+  intakeServo.initialize(int(SERVO));
   intakeServo.write(intakeServoClosedPosition);
   display1.begin(SSD1306_SWITCHCAPVCC, 0x3C);
   display2.begin(SSD1306_SWITCHCAPVCC, 0x3D);

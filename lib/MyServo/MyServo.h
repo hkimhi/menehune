@@ -1,17 +1,20 @@
-#include <Arduino.h>
-
-//#ifndef MYSERVO_H
+#ifndef MYSERVO_H
 #define MYSERVO_H
+
+#include <Arduino.h>
 
 class Servos
 {
 private:
-    String name;
-    PinName pin;
+    int pin;
     int angle;
 public:
-    Servos(String Name, PinName pin);
+    Servos(int pin);
+    Servos();
 
+    void initialize(int pin);
     void write(int angle);
     int read();
 };
+
+#endif

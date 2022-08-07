@@ -1,7 +1,7 @@
 #ifndef INTAKE_H
 #define INTAKE_H
 
-#include <Servo.h>
+//#include <Servo.h>
 #include <Adafruit_SSD1306.h>
 
 // PIN I/O
@@ -12,7 +12,7 @@
 // VARIABLES
 #define SERVO_CLOSED_POS_ADDR 0 // EEPROM memory address for servo closed position
 #define INTAKE_SERVO_OPEN_POS 0
-extern Servo intakeServo;
+//extern Servos intakeServo;
 extern bool intakeEnabled; // determines if the intake system is enabled or disabled
 extern bool hasSeenBomb;
 
