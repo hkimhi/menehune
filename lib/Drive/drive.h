@@ -20,17 +20,17 @@
 #define PWM_FREQ 500
 
 // Constants
-#define P_TURN 0.9
-#define I_TURN 0.01
+#define P_TURN 1
+#define I_TURN 0.015
 #define D_TURN 2
 #define P_DRIVE 0.25
 #define I_DRIVE 0.000
 #define D_DRIVE 0.25
-#define FFT 0.4
+#define FFT 0.40
 #define FFD 0.02
 #define LCOMP 1
-#define P_TURN_DRIVE 0.4
-#define D_TURN_DRIVE 0.3
+#define P_TURN_DRIVE 0.3
+#define D_TURN_DRIVE 0.1
 extern volatile float counter;
 extern volatile int ij;
 
@@ -47,7 +47,7 @@ extern int dTurnIR;
 
 void driveMotor(PinName fowardPin, PinName reversePin, float power);
 void PIDTurn(float setPoint, int dir, sensors_event_t a, sensors_event_t g, sensors_event_t temp);
-void PIDDrive(float dist, float satDr, bool useIR, sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp);
+void PIDDrive(float dist, float satDr, bool isTimeout, sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp);
 void encCount();
 void driveSetup();
 float clip(float in, float low, float high);

@@ -104,15 +104,18 @@ void loop()
 
   PIDDrive(173, 0.63, false, a, g, temp); // drive up starting ramp
 
-  resetGyro();
-  PIDDrive(18, 0.42, false, a, g, temp); // drive forward about to the surface edge
-  PIDTurn(40, 0, a, g, temp);            // rotate CCW
+  PIDDrive(17, 0.42, false, a, g, temp); // drive forward about to the surface edge
+  PIDTurn(30, 0, a, g, temp);            // rotate CCW
   PIDTurn(90, 1, a, g, temp);            // rotate CCW
-  PIDDrive(40, 0.42, false, a, g, temp); // drive forward about to the surface edge
-  PIDTurn(70, 1, a, g, temp);            // rotate CCW
+
+  PIDDrive(70, 0.42, false, a, g, temp); // drive forward about to the surface edge
+  PIDDrive(40, 0.39, true, a, g, temp); // drive forward about to the surface edge
+  PIDTurn(112, 1, a, g, temp);            // rotate CCW
+  PIDDrive(-43, 0.42, true, a, g, temp); // drive forward about to the surface edge
+  //PIDDrive(-15, 0.42, false, a, g, temp); // drive forward about to the surface edge
+  PIDTurn(80, 1, a, g, temp);            // rotate CCW
 
 
-            // rotate CCW
 
   alignRightCliff();
 
@@ -120,27 +123,24 @@ void loop()
   // onHit(); // closes claw manually for second treasure (if not bomb)
   delay(1000);
   resetGyro();
+  delay(500);
   PIDDrive(-20, 0.42, false, a, g, temp); // drive backwards
   delay(500);
   // unprepareClaw();
 
   // Get through arch with series of slight forward drives and turns
   PIDTurn(45, 0, a, g, temp);
-  PIDDrive(30, 0.39, false, a, g, temp);
-  PIDTurn(60, 1, a, g, temp);
-  PIDDrive(5, 0.39, false, a, g, temp);
-  PIDTurn(70, 1, a, g, temp);
-  PIDDrive(2, 0.39, false, a, g, temp);
-  PIDTurn(80, 1, a, g, temp);
-  PIDDrive(1, 0.39, false, a, g, temp);
-  PIDTurn(90, 1, a, g, temp);
+  PIDDrive(21.5, 0.39, true, a, g, temp);
+  PIDTurn(80, 0, a, g, temp);
+  PIDDrive(3, 0.39, true, a, g, temp);
+  PIDTurn(90, 0, a, g, temp);
   //irTurn(0.7);
-  PIDDrive(48, 0.42, false, a, g, temp);
+  PIDDrive(58, 0.42, true, a, g, temp);
 
   //irTurn(0.5); // face IR beacon
   resetGyro();
  
-  PIDDrive(110, 0.45, false, a,g, temp);
+  PIDDrive(90, 0.45, true, a,g, temp);
   PIDTurn(35, 1, a, g, temp);
   PIDDrive(10, 0.42, false, a, g, temp); 
   PIDTurn(90, 0, a, g, temp);
@@ -149,7 +149,7 @@ void loop()
 
   bridgeServo.write(180);
   delay(1000);
-  PIDDrive(15, 0.42, false, a, g, temp); 
+  PIDDrive(19, 0.42, false, a, g, temp); 
   PIDDrive(-75, 0.7, false, a, g, temp); 
   delay(2000);
   PIDTurn(88, 0, a, g, temp);
@@ -194,6 +194,8 @@ void getEEPROMVals()
 
 void alignRightCliff() {
   // while loop to drive along right cliff edge towards the pedestal until we hit the pedestal with the bumper
+  int turnInc = 0;
+  int enc, prevEnc = counter;
   while (getBumperState())
   {
     while (!digitalRead(REFLECTANCE_ONE) && getBumperState())
@@ -203,11 +205,21 @@ void alignRightCliff() {
       driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0.42);
     }
     delay(20);
+    turnInc = 0;
     while (digitalRead(REFLECTANCE_ONE) && getBumperState())
     {
+      enc = counter;
+      if(abs(enc - prevEnc) < 1){
+        turnInc++;
+      }
+      else{
+        turnInc = turnInc  - 3;
+      }
       // turn until right wing not detecting cliff
-      driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, -0.2);
-      driveMotor(LEFT_FOWARD, LEFT_REVERSE, -0.7);
+      driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.15);
+      driveMotor(LEFT_FOWARD, LEFT_REVERSE, -0.3 - (turnInc / 128.-0));
+      prevEnc = enc;
+      delay(10);
     }
     delay(10);
     //intakeEnabled = true;
@@ -229,8 +241,8 @@ void minDriveReverse(){
       powerInc = powerInc - 3;
     }
     prevEnc = enc;
-    driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, -powerInc / 1024.0);
-    driveMotor(LEFT_FOWARD, LEFT_REVERSE, -powerInc / 1024.0);
+    driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, (-powerInc / 1024.0) - 0.15);
+    driveMotor(LEFT_FOWARD, LEFT_REVERSE, (-powerInc / 1024.0) - 0.15);
     delay(10);
   }
   driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.2);
@@ -254,7 +266,7 @@ void minDrive(int dir){
     prevEnc = enc;
     driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, powerInc / 128.0 * dir);
     driveMotor(LEFT_FOWARD, LEFT_REVERSE, powerInc / 128.0 * dir);
-    delay(10);
+    delay(20);
   }
   driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.0);
   driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0.0);

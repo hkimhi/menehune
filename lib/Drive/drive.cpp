@@ -126,7 +126,7 @@ void PIDTurn(float setPoint, int dir, sensors_event_t accel, sensors_event_t gyr
  * @param temp temperature sensor event
  * @return None
  */
-void PIDDrive(float dist, float satDr, bool useIR, sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp)
+void PIDDrive(float dist, float satDr, bool isTimeout, sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp)
 {
   float iSat = 100;
   int error, prevError, errorSum = 0;
@@ -164,7 +164,7 @@ void PIDDrive(float dist, float satDr, bool useIR, sensors_event_t accel, sensor
 
     power = clip(power, -satDr, satDr);
 
-    if ((prevError == error) || (abs(error + prevError) <= 2 && (turnError < 1)))
+    if (((prevError == error) && isTimeout) || (abs(error + prevError) <= 2 && (turnError < 3)))
     {
       timeout++;
     }
@@ -172,16 +172,9 @@ void PIDDrive(float dist, float satDr, bool useIR, sensors_event_t accel, sensor
     delay(5);
 
     // Calculate Angle Correction Error
-    if (!useIR)
-    {
-      turnPower = (turnError * P_TURN_DRIVE);
-      turnPower += (turnError - turnPrevError) * D_TURN_DRIVE;
-    }
-    else
-    {
-      turnPower = (goertzel(IR_PIN1, 10, 4) * 1.1 - goertzel(IR_PIN2, 10, 4)) * pIR;
-    }
-
+    turnPower = (turnError * P_TURN_DRIVE);
+    turnPower += (turnError - turnPrevError) * D_TURN_DRIVE;
+    
     // Clip Turnpower to Power to prevent robot from going backwards
     turnPower = clip(turnPower, -abs(power), abs(power));
     turnPrevError = turnError;
