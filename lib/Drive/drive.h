@@ -29,8 +29,8 @@
 #define FFT 0.40
 #define FFD 0.02
 #define LCOMP 1
-#define P_TURN_DRIVE 0.3
-#define D_TURN_DRIVE 0.1
+#define P_TURN_DRIVE 0.2
+#define D_TURN_DRIVE 0.23
 extern volatile float counter;
 extern volatile int ij;
 

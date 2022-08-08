@@ -28,7 +28,7 @@ extern int intakeServoClosedPosition;
 // FUNCTION DECLARATION //
 void putEEPROMDefaults();
 void getEEPROMVals();
-void alignRightCliff();
+void alignRightCliff(float power);
 void minDriveReverse();
 void minDrive(int dir);
 
@@ -102,45 +102,54 @@ void loop()
   calibrateGyro(a, g, temp);
   delay(300);
 
-  PIDDrive(173, 0.63, false, a, g, temp); // drive up starting ramp
+  PIDDrive(173, 0.63, true, a, g, temp); // drive up starting ramp
+  PIDTurn(-35, 1, a, g, temp);
+  PIDDrive(17, 0.42, true, a, g, temp); 
+  PIDDrive(-17, 0.42, false, a, g, temp); 
+  PIDTurn(0, 1, a, g, temp);
+  PIDDrive(21, 0.42, false, a, g, temp); 
+  PIDTurn(30, 0, a, g, temp);            
+  PIDTurn(90, 1, a, g, temp);        
 
-  PIDDrive(17, 0.42, false, a, g, temp); // drive forward about to the surface edge
-  PIDTurn(30, 0, a, g, temp);            // rotate CCW
-  PIDTurn(90, 1, a, g, temp);            // rotate CCW
-
-  PIDDrive(70, 0.42, false, a, g, temp); // drive forward about to the surface edge
-  PIDDrive(40, 0.39, true, a, g, temp); // drive forward about to the surface edge
-  PIDTurn(112, 1, a, g, temp);            // rotate CCW
-  PIDDrive(-43, 0.42, true, a, g, temp); // drive forward about to the surface edge
-  //PIDDrive(-15, 0.42, false, a, g, temp); // drive forward about to the surface edge
-  PIDTurn(80, 1, a, g, temp);            // rotate CCW
+  PIDDrive(48, 0.42, false, a, g, temp); 
+  PIDTurn(50, 1, a, g, temp);           
+  alignRightCliff(0.38);
+  delay(500);
+  resetGyro();
+  PIDDrive(-40, 0.42, false, a, g, temp); 
+  PIDTurn(-6, 1, a, g, temp);            
+  alignRightCliff(0.41);
 
 
-
-  alignRightCliff();
-
-
-  // onHit(); // closes claw manually for second treasure (if not bomb)
+ 
   delay(1000);
   resetGyro();
   delay(500);
-  PIDDrive(-20, 0.42, false, a, g, temp); // drive backwards
+  PIDDrive(-20, 0.42, false, a, g, temp);
   delay(500);
-  // unprepareClaw();
-
-  // Get through arch with series of slight forward drives and turns
-  PIDTurn(45, 0, a, g, temp);
-  PIDDrive(21.5, 0.39, true, a, g, temp);
-  PIDTurn(80, 0, a, g, temp);
-  PIDDrive(3, 0.39, true, a, g, temp);
+  
+  PIDTurn(25, 0, a, g, temp);
+  PIDDrive(21, 0.39, true, a, g, temp);
   PIDTurn(90, 0, a, g, temp);
-  //irTurn(0.7);
-  PIDDrive(58, 0.42, true, a, g, temp);
-
-  //irTurn(0.5); // face IR beacon
-  resetGyro();
+  PIDDrive(51, 0.42, false, a, g, temp);
+  PIDTurn(180, 0, a, g, temp);          // turn towards third pedestal
  
-  PIDDrive(90, 0.45, true, a,g, temp);
+  PIDDrive(20, 0.34, true, a, g, temp); // drive at third pedestal
+
+  PIDDrive(-20, 0.55, false, a, g, temp); // Back away from third pedestal
+  PIDTurn(90, 1, a, g, temp);
+  PIDDrive(75, 0.43, false, a,g,temp); //Drive to position by fourth pedestal
+  PIDTurn(0, 0, a, g, temp); // Turn towards fourth pedestal
+  PIDDrive(-10, 0.42, true, a, g, temp); // back away to give roome for claw
+  PIDDrive(35, 0.34, true, a, g, temp); // drive at third pedestal
+
+  PIDDrive(-20, 0.5, false, a, g, temp); // Back away from third pedestal
+  unprepareClaw();
+  PIDTurn(90, 0, a, g, temp);
+  PIDDrive(11, 0.42, true, a, g, temp);  //poisiton to drop bridge
+  resetGyro();
+
+  PIDDrive(60, 0.45, true, a,g, temp);
   PIDTurn(35, 1, a, g, temp);
   PIDDrive(10, 0.42, false, a, g, temp); 
   PIDTurn(90, 0, a, g, temp);
@@ -153,8 +162,6 @@ void loop()
   PIDDrive(-75, 0.7, false, a, g, temp); 
   delay(2000);
   PIDTurn(88, 0, a, g, temp);
-  alignRightCliff();
-  //irTurn(0.5);
   
   while (1) 
   {
@@ -192,20 +199,23 @@ void getEEPROMVals()
   EEPROM.get(PID_DTURNIR_ADDR, dTurnIR);
 }
 
-void alignRightCliff() {
+void alignRightCliff(float power) {
   // while loop to drive along right cliff edge towards the pedestal until we hit the pedestal with the bumper
   int turnInc = 0;
   int enc, prevEnc = counter;
   while (getBumperState())
   {
+    resetTimer();
     while (!digitalRead(REFLECTANCE_ONE) && getBumperState())
     {
       // turn until right wing not detecting cliff
-      driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.42);
-      driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0.42);
+      driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, power);
+      driveMotor(LEFT_FOWARD, LEFT_REVERSE, power);
+      readGyro(a,g,temp);
     }
-    delay(20);
+    delay(70);
     turnInc = 0;
+    resetTimer();
     while (digitalRead(REFLECTANCE_ONE) && getBumperState())
     {
       enc = counter;
@@ -215,13 +225,14 @@ void alignRightCliff() {
       else{
         turnInc = turnInc  - 3;
       }
+      readGyro(a,g,temp);
       // turn until right wing not detecting cliff
-      driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.15);
+      driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, -0.13);
       driveMotor(LEFT_FOWARD, LEFT_REVERSE, -0.3 - (turnInc / 128.-0));
       prevEnc = enc;
       delay(10);
     }
-    delay(10);
+    delay(50);
     //intakeEnabled = true;
     prepareClaw();
   }

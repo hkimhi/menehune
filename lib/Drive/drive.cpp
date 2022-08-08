@@ -94,7 +94,7 @@ void PIDTurn(float setPoint, int dir, sensors_event_t accel, sensors_event_t gyr
     // Save Prev values for derivative
     prevError = error;
     power = clip(power, -turnSat, turnSat);
-    if (abs(error + prevError) / 2 < 0.3)
+    if (abs(error + prevError) / 2 < 0.5)
     {
       gyCo++;
     }
