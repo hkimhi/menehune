@@ -11,12 +11,13 @@
 #include "menu.h"
 #include "utils.h"
 
-// PIN I/O //
+// Pin I/O
 #undef LED_BUILTIN
 #define LED_BUILTIN PB2
 #define BRIDGE_SERVO PB1
 
-// CONSTANTS //
+// Constants
+
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
 #define OLED_RESET -1    // This display does not have a reset pin accessible
@@ -25,7 +26,8 @@ Adafruit_SSD1306 display2(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 extern int intakeServoClosedPosition;
 
-// FUNCTION DECLARATION //
+// Function Declarations
+
 void putEEPROMDefaults();
 void getEEPROMVals();
 void alignRightCliff();
@@ -33,7 +35,8 @@ void minDriveReverse();
 void minDrive(int dir);
 
 
-// GLOBAL VARIABLES //
+// Global Variables
+
 sensors_event_t a;    // acceleration sensor event
 sensors_event_t g;    // gyro sensor event
 sensors_event_t temp; // temperature sensor event
@@ -164,6 +167,11 @@ void loop()
   }
 }
 
+/**
+ * @brief Writes default values to the EEPROM. Should not be used often as it will overwrite ALL saved EEPROM values
+ * 
+ * @return None
+ */
 void putEEPROMDefaults()
 {
   EEPROM.put(SERVO_CLOSED_POS_ADDR, 140);
@@ -175,6 +183,11 @@ void putEEPROMDefaults()
   EEPROM.put(PID_DTURNIR_ADDR, 1000);
 }
 
+/**
+ * @brief Retrieves values from the EEPROM and stores them in global variables for use during the current runtime
+ * 
+ * @return None
+ */
 void getEEPROMVals()
 {
   EEPROM.get(SERVO_CLOSED_POS_ADDR, intakeServoClosedPosition);
@@ -192,6 +205,11 @@ void getEEPROMVals()
   EEPROM.get(PID_DTURNIR_ADDR, dTurnIR);
 }
 
+/**
+ * @brief aligns the robot to a right cliff edge by a series of forward drives and CCW rotations until the front bumper hits something
+ * 
+ * @return None
+ */
 void alignRightCliff() {
   // while loop to drive along right cliff edge towards the pedestal until we hit the pedestal with the bumper
   while (getBumperState())
@@ -217,6 +235,11 @@ void alignRightCliff() {
   driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0);
 }
 
+/**
+ * @brief slowly increases power to motors until the back reflectance sensor sees a cliff, then drives forward a tad
+ * 
+ * @return None
+ */
 void minDriveReverse(){  
   int enc, prevEnc = counter;
   int powerInc = 0;
@@ -240,6 +263,13 @@ void minDriveReverse(){
   driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0.0);
 }
 
+/**
+ * @brief slowly increases power to motors until the right wing reflectance sensor sees a cliff or
+ * the front bumper hits something, then stops the robot
+ * 
+ * @param dir the direction to turn (+1 for forward, -1 for backwards)
+ * @return None
+ */
 void minDrive(int dir){  
   int enc, prevEnc = counter;
   int powerInc = 0;
