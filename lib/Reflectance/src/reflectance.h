@@ -18,10 +18,9 @@
 // Variables
 #define REFLECTANCE_REF_ONE_ADDR 4 // EEPROM memory address for reflectance one reference
 #define REFLECTANCE_REF_TWO_ADDR 8 // EEPROM memory address for reflectance two reference
-extern Adafruit_SSD1306 display1;
 
 // Function Declarations
-void printReflectance();
+void printReflectance(Adafruit_SSD1306);
 void setReflectanceOneReference(int);
 void setReflectanceTwoReference(int);
 void align();

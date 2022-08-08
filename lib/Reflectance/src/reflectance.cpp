@@ -12,25 +12,26 @@ extern sensors_event_t temp;
 /**
  * @brief Print reflectance information to the display
  *
+ * @param display the Adafruit_SSD1306 display to write to
  * @return None
  */
-void printReflectance()
+void printReflectance(Adafruit_SSD1306 display)
 {
-    display1.clearDisplay();
-    display1.setCursor(0, 0);
+    display.clearDisplay();
+    display.setCursor(0, 0);
 
     // display1.printf("POT: %4imV | %2i\%\n", pot_val_voltage, duty_cycle_percent);
-    display1.printf("Ref one duty: %i\n", referenceOneDutyCycle);
-    display1.printf("Right wing: %i\n", digitalRead(REFLECTANCE_ONE));
-    display1.printf("Left wing: %i\n", digitalRead(REFLECTANCE_TWO));
-    display1.printf("Back: %i\n", digitalRead(REFLECTANCE_THREE));
+    display.printf("Ref one duty: %i\n", referenceOneDutyCycle);
+    display.printf("Right wing: %i\n", digitalRead(REFLECTANCE_ONE));
+    display.printf("Left wing: %i\n", digitalRead(REFLECTANCE_TWO));
+    display.printf("Back: %i\n", digitalRead(REFLECTANCE_THREE));
 
-    display1.printf("Ref two duty: %i\n", referenceTwoDutyCycle);
-    display1.printf("Front left: %i\n", digitalRead(REFLECTANCE_FOUR));
-    display1.printf("Front middle: %i\n", digitalRead(REFLECTANCE_FIVE));
-    display1.printf("Front right: %i\n", digitalRead(REFLECTANCE_SIX));
+    display.printf("Ref two duty: %i\n", referenceTwoDutyCycle);
+    display.printf("Front left: %i\n", digitalRead(REFLECTANCE_FOUR));
+    display.printf("Front middle: %i\n", digitalRead(REFLECTANCE_FIVE));
+    display.printf("Front right: %i\n", digitalRead(REFLECTANCE_SIX));
 
-    display1.display();
+    display.display();
 }
 
 /**

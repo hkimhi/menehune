@@ -2,7 +2,6 @@
 
 // GLOBAL VARIABLES //
 Adafruit_MPU6050 my_mpu;
-extern Adafruit_SSD1306 display1;
 
 float xOff, yOff, zOff = 0; // offsets for x, y, z positions
 volatile float x, y, z = 0; // will store value of x, y, z positions
@@ -73,20 +72,21 @@ void resetGyro()
 /**
  * @brief Prints gyro information to the display
  *
+ * @param display the Adafruit_SSD1306 display to write to
  * @return None
  */
-void printGyro()
+void printGyro(Adafruit_SSD1306 display)
 {
-  display1.clearDisplay();
-  display1.setCursor(0, 0);
-  display1.print("Rotation X: ");
-  display1.println(x);
-  display1.print("Rotation Y: ");
-  display1.println(y);
-  display1.print("Rotation Z: ");
-  display1.println(z);
-  display1.println(my_mpu.getSampleRateDivisor());
-  display1.display();
+  display.clearDisplay();
+  display.setCursor(0, 0);
+  display.print("Rotation X: ");
+  display.println(x);
+  display.print("Rotation Y: ");
+  display.println(y);
+  display.print("Rotation Z: ");
+  display.println(z);
+  display.println(my_mpu.getSampleRateDivisor());
+  display.display();
 
 }
 

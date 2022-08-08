@@ -3,9 +3,9 @@
 #include <EEPROM.h>
 #include "intake.h"
 
-extern Adafruit_SSD1306 display1;
 Servo intakeServo;
 int intakeServoClosedPosition = 140;
+extern Adafruit_SSD1306 display1;
 
 bool intakeEnabled = false;
 bool currentlySeesBomb = false;
@@ -14,19 +14,20 @@ bool hasSeenBomb = false;
 /**
  * @brief Prints intake information to the display
  *
+ * @param display the Adafruit_SSD1306 display to write to
  * @return None
  */
-void printIntake()
+void printIntake(Adafruit_SSD1306 display)
 {
-  display1.setCursor(0, 0);
-  display1.clearDisplay();
-  display1.printf("intakeEnabled: %i\n", intakeEnabled);
-  display1.printf("currentlySeesBomb: %i\n", currentlySeesBomb);
-  display1.printf("Closed Position: %i\n", intakeServoClosedPosition);
-  display1.printf("Servo Position: %i\n", intakeServo.read());
-  display1.printf("Bumper Switch: %i\n", digitalRead(BUMPER_SWITCH));
-  display1.printf("NotMagnet: %i\n", digitalRead(HALL_INPUT));
-  display1.display();
+  display.setCursor(0, 0);
+  display.clearDisplay();
+  display.printf("intakeEnabled: %i\n", intakeEnabled);
+  display.printf("currentlySeesBomb: %i\n", currentlySeesBomb);
+  display.printf("Closed Position: %i\n", intakeServoClosedPosition);
+  display.printf("Servo Position: %i\n", intakeServo.read());
+  display.printf("Bumper Switch: %i\n", digitalRead(BUMPER_SWITCH));
+  display.printf("NotMagnet: %i\n", digitalRead(HALL_INPUT));
+  display.display();
 }
 
 /**
@@ -39,7 +40,7 @@ void onHit()
   if (intakeEnabled && !currentlySeesBomb)
   {
     intakeServo.write(intakeServoClosedPosition);
-    printIntake();
+    printIntake(display1);
   }
 }
 

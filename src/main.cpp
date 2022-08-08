@@ -163,7 +163,7 @@ void loop()
   {
     displayMenu(display2);
     // displayInfoScreen(display1);
-    printReflectance();
+    printReflectance(display1);
   }
 }
 

@@ -1,7 +1,7 @@
 #include "drive.h"
 #include <EEPROM.h>
 
-// GLOBAL VARIABLES //
+// Global Variables
 extern Adafruit_SSD1306 display1;
 
 float turnSat = 0.6;

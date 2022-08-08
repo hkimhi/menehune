@@ -14,7 +14,7 @@ extern volatile float x, y, z; // will store value of x, y, z positions
 void readGyro(sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp);
 void calibrateGyro(sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp);
 void resetGyro();
-void printGyro();
+void printGyro(Adafruit_SSD1306);
 void resetTimer();
 
 #endif

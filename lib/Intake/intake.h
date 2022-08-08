@@ -18,7 +18,7 @@ extern bool intakeEnabled; // determines if the intake system is enabled or disa
 extern bool hasSeenBomb;
 
 // FUNCTION DECLARATIONS
-void printIntake();
+void printIntake(Adafruit_SSD1306);
 void onHit();
 void onDetectBomb();
 void prepareClaw();
