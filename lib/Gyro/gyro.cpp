@@ -26,7 +26,7 @@ void readGyro(sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp)
   if (abs(gyro.gyro.y + yOff) >= MIN_GYRO)
     y += (gyro.gyro.y + yOff) * CONV * (millis() - timeLastCall) / 1000;
   if (abs(gyro.gyro.z + zOff) >= MIN_GYRO)
-    z += (gyro.gyro.z + zOff) * CONV * (millis() - timeLastCall) / 1000;
+    z += (gyro.gyro.z + zOff * 1.32) * CONV * (millis() - timeLastCall) / 1000;
   timeLastCall = millis();
 }
 
@@ -51,7 +51,7 @@ void calibrateGyro(sensors_event_t accel, sensors_event_t gyro, sensors_event_t 
 
   my_mpu.setAccelerometerRange(MPU6050_RANGE_8_G);
   my_mpu.setGyroRange(MPU6050_RANGE_2000_DEG);
-  my_mpu.setFilterBandwidth(MPU6050_BAND_44_HZ);
+  my_mpu.setFilterBandwidth(MPU6050_BAND_21_HZ);
   my_mpu.getEvent(&accel, &gyro, &temp);
   xOff = -gyro.gyro.x;
   yOff = -gyro.gyro.y;

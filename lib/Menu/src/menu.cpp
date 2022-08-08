@@ -73,7 +73,7 @@ void displayMenu(Adafruit_SSD1306 display)
     int x = analogRead(JOYSTICK_X);
     int y = analogRead(JOYSTICK_Y);
 
-    if (y > 768)
+    if (y > 850)
     {
         // down
         selectedItem += 1;
@@ -82,7 +82,7 @@ void displayMenu(Adafruit_SSD1306 display)
 
         selectedOption += 1;
     }
-    else if (y < 200)
+    else if (y < 150)
     {
         // up
         selectedItem -= 1;
@@ -94,12 +94,12 @@ void displayMenu(Adafruit_SSD1306 display)
             selectedOption = 0;
     }
 
-    if (x > 768)
+    if (x > 850)
     {
         // left
         enteredItem = -1;
     }
-    else if (x < 256)
+    else if (x < 150)
     {
         // right
         enteredItem = selectedItem;

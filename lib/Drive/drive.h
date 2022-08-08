@@ -20,16 +20,16 @@
 #define PWM_FREQ 500
 
 // Constants
-#define P_TURN 1
+#define P_TURN 0.5
 #define I_TURN 0.015
 #define D_TURN 2
 #define P_DRIVE 0.25
 #define I_DRIVE 0.000
 #define D_DRIVE 0.25
-#define FFT 0.40
+#define FFT 0.1
 #define FFD 0.02
 #define LCOMP 1
-#define P_TURN_DRIVE 0.2
+#define P_TURN_DRIVE 0.4
 #define D_TURN_DRIVE 0.23
 extern volatile float counter;
 extern volatile int ij;

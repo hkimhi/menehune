@@ -8,8 +8,7 @@ Servo intakeServo;
 int intakeServoClosedPosition = 140;
 
 bool intakeEnabled = false;
-bool currentlySeesBomb = false;
-bool hasSeenBomb = false;
+volatile bool currentlySeesBomb = false;
 
 /**
  * @brief Prints intake information to the display
@@ -36,10 +35,17 @@ void printIntake()
  */
 void onHit()
 {
-  if (intakeEnabled && !currentlySeesBomb)
-  {
-    intakeServo.write(intakeServoClosedPosition);
-    printIntake();
+  for(int i = 0; i < 20; i++){
+     if (intakeEnabled && digitalRead(HALL_INPUT))
+    {
+      intakeServo.write(intakeServoClosedPosition);
+      printIntake();
+    }
+    else
+    {
+      intakeServo.write(INTAKE_SERVO_OPEN_POS);
+    }
+    delay(10);
   }
 }
 
@@ -54,7 +60,6 @@ void onDetectBomb()
   {
     intakeServo.write(INTAKE_SERVO_OPEN_POS);
     currentlySeesBomb = true;
-    hasSeenBomb = true;
   }
 }
 
@@ -68,6 +73,7 @@ void prepareClaw()
   intakeServo.write(INTAKE_SERVO_OPEN_POS);
   intakeEnabled = true;
   currentlySeesBomb = false;
+  delay(200);
 }
 
 /**

@@ -50,6 +50,13 @@ void driveMotor(PinName fowardPin, PinName reversePin, float power)
     pwm_start(reversePin, PWM_FREQ, (int)(32768 * abs(power)), TimerCompareFormat_t::RESOLUTION_16B_COMPARE_FORMAT);
   }
   else
+#define P_DRIVE 0.25
+#define I_DRIVE 0.000
+#define D_DRIVE 0.25
+#define FFT 0.2
+#define FFD 0.02
+#define LCOMP 1
+#define P_TURN_DRIVE 0.2
   {
     pwm_start(reversePin, PWM_FREQ, 0, TimerCompareFormat_t::RESOLUTION_16B_COMPARE_FORMAT);
     pwm_start(fowardPin, PWM_FREQ, 0, TimerCompareFormat_t::RESOLUTION_16B_COMPARE_FORMAT);
@@ -72,6 +79,7 @@ void PIDTurn(float setPoint, int dir, sensors_event_t accel, sensors_event_t gyr
   float iSat = 100;
   float error, prevError, errorSum = 0;
   float power;
+  int closeIntegral = 0; // Integral term for only if the robot is close to its setPoint but not moving
   // resetGyro();
   int gyCo = 0;
   resetTimer();
@@ -91,21 +99,33 @@ void PIDTurn(float setPoint, int dir, sensors_event_t accel, sensors_event_t gyr
       errorSum = errorSum / abs(errorSum) * iSat;
     // integrate Errors
     errorSum += error;
-    // Save Prev values for derivative
-    prevError = error;
+    
     power = clip(power, -turnSat, turnSat);
-    if (abs(error + prevError) / 2 < 0.5)
+
+    if (abs(error + prevError) / 2 < 0.7)
     {
       gyCo++;
     }
+    else if(abs(error) < 5 && (prevError == error))
+    {
+      closeIntegral++;
+      gyCo = 0;
+      power += copysign(closeIntegral / 256.0, error);
+    }
+    else {
+      gyCo = 0;
+    }
+
+    // Save Prev values for derivative
+    prevError = error;
     if (dir == 1)
     {
-      driveMotor(LEFT_FOWARD, LEFT_REVERSE, -power * LCOMP);
-      driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, copysign(0.20 * LCOMP, power));
+      driveMotor(LEFT_FOWARD, LEFT_REVERSE, -power);
+      driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, copysign(0.1, power));
     }
     else
     {
-      driveMotor(LEFT_FOWARD, LEFT_REVERSE, copysign(0.20, -power) * LCOMP);
+      driveMotor(LEFT_FOWARD, LEFT_REVERSE, copysign(0.1, -power));
       driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, power);
     }
 
@@ -120,7 +140,7 @@ void PIDTurn(float setPoint, int dir, sensors_event_t accel, sensors_event_t gyr
  *
  * @param dist target distance
  * @param satDr saturation value for drive (maximum drive power)
- * @param useIR determines if the IR sensors should be used for angle correction
+ * @param isTimeout if set to true, times out the function after 30 cycles
  * @param accel acceleration sensor event (xyz acceleration)
  * @param gyro gyro sensor event (xyz rotational velocity)
  * @param temp temperature sensor event
@@ -164,12 +184,12 @@ void PIDDrive(float dist, float satDr, bool isTimeout, sensors_event_t accel, se
 
     power = clip(power, -satDr, satDr);
 
-    if (((prevError == error) && isTimeout) || (abs(error + prevError) <= 2 && (turnError < 3)))
+    if (((prevError == error) && isTimeout) || (abs(error + prevError) <= 2 && (turnError < 2)))
     {
       timeout++;
     }
     prevError = error;
-    delay(5);
+    //delay(5);
 
     // Calculate Angle Correction Error
     turnPower = (turnError * P_TURN_DRIVE);
@@ -280,7 +300,7 @@ void irTurn(float sat)
   int threshold = 0.001;
   while (irCount < 25)
   {
-    error = goertzel(IR_PIN1, 25, 8) - goertzel(IR_PIN2, 25, 8);
+    error = (goertzel(IR_PIN1, 25, 8) - goertzel(IR_PIN2, 25, 8)) + 0.2;
     errorInt += error;
     power = error * -pTurnIR;
     power += (error - prevError) * -dTurnIR;

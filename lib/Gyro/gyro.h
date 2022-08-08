@@ -5,8 +5,8 @@
 #include <Adafruit_SSD1306.h>
 #include <Adafruit_Sensor.h>
 
-#define MIN_GYRO 0.01
-#define CONV 180 / 3.14
+#define MIN_GYRO 0.03
+#define CONV (180 / 3.14)
 
 extern float xOff, yOff, zOff; // offsets for x, y, z positions
 extern volatile float x, y, z; // will store value of x, y, z positions
