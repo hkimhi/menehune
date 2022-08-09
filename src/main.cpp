@@ -120,11 +120,11 @@ void loop()
   delay(100);
   PIDDrive(-14, 0.42, false, a, g, temp); // reverse from first pedestal
   unprepareClaw();
-  PIDTurn(30, 0, a, g, temp);
+  PIDTurn(35, 0, a, g, temp);
   minDrive(1);
   PIDTurn(90, 1, a, g, temp);
-  PIDDrive(54, 0.42, true, a, g, temp); // cross chicken wire
-  PIDTurn(69, 1, a, g, temp);
+  PIDDrive(50, 0.42, true, a, g, temp); // cross chicken wire
+  PIDTurn(75, 1, a, g, temp);
 
 
   prepareClaw();
@@ -141,7 +141,7 @@ void loop()
   unprepareClaw();
   delay(200);
 
-  PIDTurn(25, 0, a, g, temp);
+  PIDTurn(32, 0, a, g, temp);
   PIDDrive(19, 0.39, true, a, g, temp);
   PIDTurn(90, 0, a, g, temp);            // turn towards the arch to go through
   PIDDrive(50, 0.42, false, a, g, temp); // drive through arch
@@ -175,7 +175,6 @@ void loop()
   PIDTurn(35, 1, a, g, temp);            // turn part of the way CCW to get back towards bridge
   PIDDrive(10, 0.42, true, a, g, temp); // drive forward a bit
   PIDTurn(90, 0, a, g, temp);            // turn the rest of the way CCW to get back perpendicular to cliff*/
-  PIDDrive(-25, 0.42, true, a, g, temp); // drive forward a bit
   minDriveReverse();                     // backup super slowly until it sees the cliff
   driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.6);
   driveMotor(LEFT_FOWARD, LEFT_REVERSE,0.6);
@@ -403,12 +402,12 @@ void alignRightCliff(float power)
       }
       readGyro(a, g, temp);
       // turn until right wing not detecting cliff
-      driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.2);
+      driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, -0.2);
       driveMotor(LEFT_FOWARD, LEFT_REVERSE, -0.3 - (turnInc / 128. - 0));
       prevEnc = enc;
       delay(10);
     }
-    delay(30);
+    delay(5);
     turnIter++;
 
     // intakeEnabled = true;
