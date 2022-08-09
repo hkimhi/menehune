@@ -75,7 +75,7 @@ void driveMotor(PinName fowardPin, PinName reversePin, float power)
  */
 void PIDTurn(float setPoint, int dir, sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp)
 {
-  float turnSat = 0.82;
+  float turnSat = 0.85;
   float iSat = 100;
   float error, prevError, errorSum = 0;
   float power;
@@ -110,7 +110,7 @@ void PIDTurn(float setPoint, int dir, sensors_event_t accel, sensors_event_t gyr
     {
       closeIntegral++;
       gyCo = 0;
-      power += copysign(closeIntegral / 256.0, error);
+      power += copysign(closeIntegral / 128.0, error);
     }
     else {
       gyCo = 0;
@@ -126,6 +126,7 @@ void PIDTurn(float setPoint, int dir, sensors_event_t accel, sensors_event_t gyr
     else if (dir == 2){
       driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, power);
       driveMotor(LEFT_FOWARD, LEFT_REVERSE, -power);
+      turnSat = 0.6;
     }
     else
     {
@@ -166,7 +167,7 @@ void PIDDrive(float dist, float satDr, bool isTimeout, sensors_event_t accel, se
   driveMotor(LEFT_FOWARD, LEFT_REVERSE, copysign(satDr, dist));
   driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, copysign(satDr, dist));
   resetTimer();
-  while (timeout < 30)
+  while (timeout < 15)
   {
 
     readGyro(accel, gyro, temp);

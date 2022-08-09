@@ -35,18 +35,17 @@ void printIntake()
  */
 void onHit()
 {
-  for(int i = 0; i < 20; i++){
+  for(int i = 0; i < 140; i+=6){
      if (intakeEnabled && digitalRead(HALL_INPUT))
     {
-      intakeServo.write(intakeServoClosedPosition);
+      intakeServo.write(i);
       printIntake();
     }
     else
     {
       intakeServo.write(INTAKE_SERVO_OPEN_POS);
-      i += 5;
+      i += 20;
     }
-    delay(10);
   }
 }
 

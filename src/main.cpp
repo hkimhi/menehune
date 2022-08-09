@@ -97,16 +97,20 @@ void loop()
   //   displayMenu(display2);
   //   displayInfoScreen(display1);
   // }
-
-  /*
+  // while(1){
+  //   onHit();
+  //   delay(500);
+  //   prepareClaw();
+  //   delay(500);
+  //   printIntake();
+  // }
+  
   driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0);
   driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0);
 
   delay(500);
   intakeServo.write(INTAKE_SERVO_OPEN_POS);
-  calibrateGyro(a, g, temp);
-  delay(300);
-
+ 
   PIDDrive(173, 0.63, false, a, g, temp); // drive up starting ramp
   prepareClaw();
   PIDTurn(-32, 1, a, g, temp);          // aim at first pedestal
@@ -114,62 +118,57 @@ void loop()
 
   PIDDrive(16, 0.42, true, a, g, temp); // drive at first pedestal
   onHit();
-  delay(500);
+  delay(100);
   PIDDrive(-14, 0.42, false, a, g, temp); // reverse from first pedestal
   unprepareClaw();
   PIDTurn(0, 1, a, g, temp);             // turn to aim forward
   PIDDrive(16, 0.42, false, a, g, temp); // drive forward
   PIDTurn(30, 0, a, g, temp);            // rotate robot in 2 steps
   PIDTurn(90, 1, a, g, temp);
-
-  resetTimer();
-
   PIDDrive(48, 0.42, false, a, g, temp); // Drive straight over the chicken wire
   PIDTurn(50, 1, a, g, temp);            // turn to face for the ledge
   prepareClaw();
-  alignRightCliff(0.38);
-  delay(500);
+  /*alignRightCliff(0.38);
   resetGyro();
   PIDDrive(-30, 0.42, false, a, g, temp); // backup robot to realign with align right cliff
-  PIDTurn(-6, 1, a, g, temp);
+  PIDTurn(-6, 1, a, g, temp);*/
   alignRightCliff(0.41);
   onHit();
-  delay(1000);
+  delay(200);
   resetGyro();
-  delay(500);
   PIDDrive(-20, 0.42, false, a, g, temp); // Back away from the pedestal
   unprepareClaw();
-  delay(500);
+  delay(200);
 
   PIDTurn(25, 0, a, g, temp);
   PIDDrive(19, 0.39, true, a, g, temp);
   PIDTurn(90, 0, a, g, temp);            // turn towards the arch to go through
-  PIDDrive(51, 0.42, false, a, g, temp); // drive through arch
+  PIDDrive(58, 0.42, false, a, g, temp); // drive through arch
   
   
   PIDTurn(180, 0, a, g, temp);           // turn towards third pedestal
   PIDDrive(-8, 0.6, false, a, g, temp);  // give space for claw to open
   prepareClaw();                         // open claw
-  delay(300);
+  delay(200);
   PIDDrive(23, 0.39, true, a, g, temp); // drive at third pedestal
   onHit();                             // collect third treasure
-  delay(600);
+  delay(500);
 
   PIDDrive(-20, 0.55, false, a, g, temp); // Back away from third pedestal
   unprepareClaw();                        // close claw for safe storage during transprt
   PIDTurn(90, 1, a, g, temp);             // aim towards IR beacon
   
-  PIDDrive(69, 0.43, false, a, g, temp);  // drive to position by fourth pedestal
+  PIDDrive(71, 0.43, false, a, g, temp);  // drive to position by fourth pedestal
   PIDTurn(0, 0, a, g, temp);              // turn towards fourth pedestal
   prepareClaw();                          // open claw
   PIDDrive(35, 0.34, true, a, g, temp);   // drive at fourth pedestal
   onHit();                                // collect fourth treasure
-  delay(500);
+  delay(200);
 
   PIDDrive(-20, 0.5, false, a, g, temp); // Back away from fourth pedestal
   unprepareClaw();                       // close claw for safe storage during transport
   PIDTurn(90, 0, a, g, temp);            // move away from fourth claw towards IR beacon
-  PIDDrive(9, 0.42, true, a, g, temp);  // poisiton to drop bridge
+  PIDDrive(3, 0.42, true, a, g, temp);  // poisiton to drop bridge
   resetGyro();
   PIDTurn(35, 1, a, g, temp);            // turn part of the way CCW to get back towards bridge
   PIDDrive(10, 0.42, false, a, g, temp); // drive forward a bit
@@ -186,17 +185,22 @@ void loop()
   PIDDrive(-75, 0.7, false, a, g, temp); // drive backwards very quickly to power up the bridge
   PIDDrive(7, 0.42, false, a, g, temp); // drive forward a bit
   resetGyro();
-  delay(2000);
+  delay(200);
 
   // FOR 5TH SMALL SILVER TREASURE //
-  PIDTurn(180, 2, a, g, temp);         // rotate towards 5th pedestal
-  /*prepareClaw();                       // open claw for pickup
-  PIDDrive(8, 0.5, false, a, g, temp); // drive towards 5th pedestal
+  PIDTurn(-45, 1, a, g, temp);         // rotate towards 5th pedestal
+  PIDDrive(-7, 0.42, false, a, g, temp); // drive forward a bit
+  PIDTurn(-90, 0, a, g, temp);         // rotate towards 5th pedestal
+
+  PIDDrive(-7, 0.42, true, a, g, temp); // drive forward a bit
+
+  prepareClaw();                       // open claw for pickup
+  PIDDrive(20, 0.42, true, a, g, temp); // drive towards 5th pedestal
   onHit();                             // pickup 5th treasure
   delay(200);
-  PIDDrive(-4, 0.5, false, a, g, temp); // drive backwards towards center of platform
+  PIDDrive(-7, 0.5, true, a, g, temp); // drive backwards towards center of platform
   unprepareClaw();
-
+  /*
   // FOR 6TH GOLDEN TREASURE //
   PIDTurn(90, 0, a, g, temp); // turn towards end of suspension bridge
 
