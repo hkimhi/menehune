@@ -75,11 +75,13 @@ void driveMotor(PinName fowardPin, PinName reversePin, float power)
  */
 void PIDTurn(float setPoint, int dir, sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp)
 {
-  float turnSat = 0.85;
+  float turnSat = 0.87;
   float iSat = 100;
   float error, prevError, errorSum = 0;
   float power;
+  int startTime = millis();
   int closeIntegral = 0; // Integral term for only if the robot is close to its setPoint but not moving
+  float sidePower = 0.1;
   // resetGyro();
   int gyCo = 0;
   resetTimer();
@@ -106,11 +108,15 @@ void PIDTurn(float setPoint, int dir, sensors_event_t accel, sensors_event_t gyr
     {
       gyCo++;
     }
-    else if(abs(error) < 5 && (prevError == error))
+    else if(abs(error) < 10 && (prevError == error))
     {
       closeIntegral++;
       gyCo = 0;
       power += copysign(closeIntegral / 128.0, error);
+      if(millis() - startTime > 2000){
+        turnSat = 1.2;
+        sidePower = 0.4;
+      }
     }
     else {
       gyCo = 0;
@@ -121,7 +127,7 @@ void PIDTurn(float setPoint, int dir, sensors_event_t accel, sensors_event_t gyr
     if (dir == 1)
     {
       driveMotor(LEFT_FOWARD, LEFT_REVERSE, -power);
-      driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, copysign(0.1, power));
+      driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, copysign(sidePower, power));
     }
     else if (dir == 2){
       driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, power);
@@ -130,7 +136,7 @@ void PIDTurn(float setPoint, int dir, sensors_event_t accel, sensors_event_t gyr
     }
     else
     {
-      driveMotor(LEFT_FOWARD, LEFT_REVERSE, copysign(0.1, -power));
+      driveMotor(LEFT_FOWARD, LEFT_REVERSE, copysign(sidePower, -power));
       driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, power);
     }
     
