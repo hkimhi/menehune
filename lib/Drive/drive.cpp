@@ -123,11 +123,16 @@ void PIDTurn(float setPoint, int dir, sensors_event_t accel, sensors_event_t gyr
       driveMotor(LEFT_FOWARD, LEFT_REVERSE, -power);
       driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, copysign(0.1, power));
     }
+    else if (dir == 2){
+      driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, power);
+      driveMotor(LEFT_FOWARD, LEFT_REVERSE, -power);
+    }
     else
     {
       driveMotor(LEFT_FOWARD, LEFT_REVERSE, copysign(0.1, -power));
       driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, power);
     }
+    
 
     printDrive(power, error, errorSum, prevError);
   }

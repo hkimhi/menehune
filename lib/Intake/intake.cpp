@@ -44,6 +44,7 @@ void onHit()
     else
     {
       intakeServo.write(INTAKE_SERVO_OPEN_POS);
+      i += 5;
     }
     delay(10);
   }

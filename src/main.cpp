@@ -91,15 +91,14 @@ void setup(void)
 void loop()
 {
   calibrateGyro(a, g, temp);
-  resetTimer();
-  
+
   // while (shouldStart == 0)
   // {
   //   displayMenu(display2);
   //   displayInfoScreen(display1);
   // }
 
-  
+  /*
   driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0);
   driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0);
 
@@ -110,7 +109,7 @@ void loop()
 
   PIDDrive(173, 0.63, false, a, g, temp); // drive up starting ramp
   prepareClaw();
-  PIDTurn(-35, 1, a, g, temp);          // aim at first pedestal
+  PIDTurn(-32, 1, a, g, temp);          // aim at first pedestal
 
 
   PIDDrive(16, 0.42, true, a, g, temp); // drive at first pedestal
@@ -143,7 +142,7 @@ void loop()
   delay(500);
 
   PIDTurn(25, 0, a, g, temp);
-  PIDDrive(21, 0.39, true, a, g, temp);
+  PIDDrive(19, 0.39, true, a, g, temp);
   PIDTurn(90, 0, a, g, temp);            // turn towards the arch to go through
   PIDDrive(51, 0.42, false, a, g, temp); // drive through arch
   
@@ -152,17 +151,15 @@ void loop()
   PIDDrive(-8, 0.6, false, a, g, temp);  // give space for claw to open
   prepareClaw();                         // open claw
   delay(300);
-  PIDDrive(20, 0.39, true, a, g, temp); // drive at third pedestal
+  PIDDrive(23, 0.39, true, a, g, temp); // drive at third pedestal
   onHit();                             // collect third treasure
   delay(600);
 
   PIDDrive(-20, 0.55, false, a, g, temp); // Back away from third pedestal
   unprepareClaw();                        // close claw for safe storage during transprt
   PIDTurn(90, 1, a, g, temp);             // aim towards IR beacon
-
-  irTurn(0.6);
   
-  PIDDrive(72, 0.43, false, a, g, temp);  // drive to position by fourth pedestal
+  PIDDrive(69, 0.43, false, a, g, temp);  // drive to position by fourth pedestal
   PIDTurn(0, 0, a, g, temp);              // turn towards fourth pedestal
   prepareClaw();                          // open claw
   PIDDrive(35, 0.34, true, a, g, temp);   // drive at fourth pedestal
@@ -172,12 +169,12 @@ void loop()
   PIDDrive(-20, 0.5, false, a, g, temp); // Back away from fourth pedestal
   unprepareClaw();                       // close claw for safe storage during transport
   PIDTurn(90, 0, a, g, temp);            // move away from fourth claw towards IR beacon
-  PIDDrive(11, 0.42, true, a, g, temp);  // poisiton to drop bridge
+  PIDDrive(9, 0.42, true, a, g, temp);  // poisiton to drop bridge
   resetGyro();
-
   PIDTurn(35, 1, a, g, temp);            // turn part of the way CCW to get back towards bridge
   PIDDrive(10, 0.42, false, a, g, temp); // drive forward a bit
-  PIDTurn(90, 0, a, g, temp);            // turn the rest of the way CCW to get back perpendicular to cliff
+  PIDTurn(90, 0, a, g, temp);            // turn the rest of the way CCW to get back perpendicular to cliff*/
+
   minDriveReverse();                     // backup super slowly until it sees the cliff
   PIDDrive(5, 0.42, false, a, g, temp);  // drive foward to make space for bridge
 
@@ -187,12 +184,13 @@ void loop()
   PIDDrive(19, 0.42, false, a, g, temp); // drive forward a bit
 
   PIDDrive(-75, 0.7, false, a, g, temp); // drive backwards very quickly to power up the bridge
+  PIDDrive(7, 0.42, false, a, g, temp); // drive forward a bit
   resetGyro();
   delay(2000);
 
   // FOR 5TH SMALL SILVER TREASURE //
-  PIDTurn(-90, 0, a, g, temp);         // rotate towards 5th pedestal
-  prepareClaw();                       // open claw for pickup
+  PIDTurn(180, 2, a, g, temp);         // rotate towards 5th pedestal
+  /*prepareClaw();                       // open claw for pickup
   PIDDrive(8, 0.5, false, a, g, temp); // drive towards 5th pedestal
   onHit();                             // pickup 5th treasure
   delay(200);
@@ -320,7 +318,7 @@ void loop()
     displayMenu(display2);
     // displayInfoScreen(display1);
     printReflectance();
-  }
+  }*/
 }
 
 void putEEPROMDefaults()

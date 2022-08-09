@@ -17,6 +17,7 @@ int timeLastCall = millis();
  * @param temp temperature sensor event
  * @return None
  */
+
 void readGyro(sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp)
 {
   
@@ -25,8 +26,8 @@ void readGyro(sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp)
     x += (gyro.gyro.x + xOff) * CONV * (millis() - timeLastCall) / 1000;
   if (abs(gyro.gyro.y + yOff) >= MIN_GYRO)
     y += (gyro.gyro.y + yOff) * CONV * (millis() - timeLastCall) / 1000;
-  if (abs(gyro.gyro.z + zOff) >= MIN_GYRO)
-    z += (gyro.gyro.z + zOff * 1.32) * CONV * (millis() - timeLastCall) / 1000;
+  if (abs(gyro.gyro.z + ZOFF) >= MIN_GYRO)
+    z += (gyro.gyro.z + ZOFF) * CONV * (millis() - timeLastCall) / 1000;
   timeLastCall = millis();
 }
 
@@ -85,9 +86,7 @@ void printGyro()
   display1.println(y);
   display1.print("Rotation Z: ");
   display1.println(z);
-  display1.println(my_mpu.getSampleRateDivisor());
   display1.display();
-
 }
 
 void resetTimer(){

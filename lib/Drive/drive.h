@@ -20,7 +20,7 @@
 #define PWM_FREQ 500
 
 // Constants
-#define P_TURN 0.5
+#define P_TURN 0.35
 #define I_TURN 0.015
 #define D_TURN 2
 #define P_DRIVE 0.25
