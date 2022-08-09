@@ -35,7 +35,7 @@ void printIntake()
  */
 void onHit()
 {
-  for(int i = 0; i < 140; i+=12){
+  for(int i = 0; i < 140; i+=8){
      if (intakeEnabled && digitalRead(HALL_INPUT))
     {
       intakeServo.write(i);
@@ -44,7 +44,7 @@ void onHit()
     else
     {
       intakeServo.write(INTAKE_SERVO_OPEN_POS);
-      i += 20;
+      i += 70;
     }
   }
 }

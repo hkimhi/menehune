@@ -108,12 +108,12 @@ void PIDTurn(float setPoint, int dir, sensors_event_t accel, sensors_event_t gyr
     {
       gyCo++;
     }
-    else if(abs(error) < 10 && (prevError == error))
+    else if(abs(error) < 10 && (abs(prevError - error) < 0.7))
     {
       closeIntegral++;
       gyCo = 0;
       power += copysign(closeIntegral / 128.0, error);
-      if(millis() - startTime > 2000){
+      if((millis() - startTime) > 2000){
         turnSat = 1.2;
         sidePower = 0.4;
       }
