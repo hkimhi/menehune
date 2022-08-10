@@ -174,7 +174,7 @@ bool PIDDrive(float dist, float satDr, bool isTimeout, sensors_event_t accel, se
   driveMotor(LEFT_FOWARD, LEFT_REVERSE, copysign(satDr, dist));
   driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, copysign(satDr, dist));
   resetTimer();
-  while (timeout < 15 && targetCount < 10)
+  while (timeout < 30 && targetCount < 10)
   {
 
     readGyro(accel, gyro, temp);
@@ -200,6 +200,9 @@ bool PIDDrive(float dist, float satDr, bool isTimeout, sensors_event_t accel, se
     if (((prevError == error) && isTimeout))
     {
       timeout++;
+    }
+    else{
+      timeout = 0;
     }
     if((abs(error + prevError) <= 2 && (turnError < 2))){
       targetCount++;

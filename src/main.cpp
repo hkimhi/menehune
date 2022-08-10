@@ -93,11 +93,7 @@ void loop()
 {
   resetTimer();
   // gyroTune(a,g,temp);
-  //  while (1)
-  //  {
-  //    readGyro(a,g,temp);
-  //    printGyro();
-  //  }
+
 
   while (shouldStart == 0)
   {
@@ -113,15 +109,22 @@ void loop()
 
   PIDDrive(173, 0.63, false, a, g, temp); // drive up starting ramp
 
+     while (1)
+   {
+     readGyro(a,g,temp);
+     printGyro();
+   }
+
   PIDDrive(16, 0.42, true, a, g, temp); // drive at first pedestal
   onHit();
   delay(100);
   PIDDrive(-14, 0.42, false, a, g, temp); // reverse from first pedestal
+  delay(120);
   unprepareClaw();
   PIDTurn(35, 0, a, g, temp);
   minDrive(1);
-  PIDTurn(84, 1, a, g, temp);
-  PIDDrive(49, 0.42, true, a, g, temp); // cross chicken wire
+  PIDTurn(87, 1, a, g, temp);
+  PIDDrive(50, 0.42, false, a, g, temp); // cross chicken wire
   PIDTurn(77, 1, a, g, temp);
 
   prepareClaw();
@@ -131,13 +134,16 @@ void loop()
   delay(200);
   resetGyro();
   PIDDrive(-20, 0.42, false, a, g, temp); // Back away from the pedestal
+  
   unprepareClaw();
   delay(200);
 
   PIDTurn(32, 0, a, g, temp);
-  PIDDrive(21, 0.40, true, a, g, temp);
+  PIDDrive(19, 0.40, true, a, g, temp);
+
+  
   PIDTurn(90, 0, a, g, temp); // turn towards the arch to go through
-  if (PIDDrive(51, 0.42, false, a, g, temp))
+  if (PIDDrive(51, 0.42, true, a, g, temp))
   { // Try drive through arc, if fails turn and try again
     PIDTurn(-10, 0, a, g, temp);
     PIDDrive(10, 0.45, true, a, g, temp);

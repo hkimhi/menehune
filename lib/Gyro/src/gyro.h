@@ -9,7 +9,7 @@
 #define CONV (180 / 3.14)
 #define XOFF 38.16/1000
 #define YOFF -24.54/1000
-#define ZOFF -42.50/1000
+#define ZOFF -44.90/1000
 
 extern float xOff, yOff, zOff; // offsets for x, y, z positions
 extern volatile float x, y, z; // will store value of x, y, z positions
