@@ -92,11 +92,15 @@ void setup(void)
 void loop()
 {
   resetTimer();
-  // gyroTune(a,g,temp);
-
 
   while (shouldStart == 0)
   {
+    if (shouldRunOffset == 1)
+    {
+      gyroTune(a, g, temp);
+      initializeMenu();
+    }
+
     displayMenu(display2);
     displayInfoScreen(display1);
   }
@@ -109,11 +113,11 @@ void loop()
 
   PIDDrive(173, 0.63, false, a, g, temp); // drive up starting ramp
 
-     while (1)
-   {
-     readGyro(a,g,temp);
-     printGyro();
-   }
+  while (1)
+  {
+    readGyro(a, g, temp);
+    printGyro();
+  }
 
   PIDDrive(16, 0.42, true, a, g, temp); // drive at first pedestal
   onHit();
@@ -134,14 +138,13 @@ void loop()
   delay(200);
   resetGyro();
   PIDDrive(-20, 0.42, false, a, g, temp); // Back away from the pedestal
-  
+
   unprepareClaw();
   delay(200);
 
   PIDTurn(32, 0, a, g, temp);
   PIDDrive(19, 0.40, true, a, g, temp);
 
-  
   PIDTurn(90, 0, a, g, temp); // turn towards the arch to go through
   if (PIDDrive(51, 0.42, true, a, g, temp))
   { // Try drive through arc, if fails turn and try again
@@ -179,7 +182,7 @@ void loop()
   PIDDrive(-20, 0.5, false, a, g, temp); // Back away from fourth pedestal
   unprepareClaw();                       // close claw for safe storage during transport
   PIDTurn(90, 0, a, g, temp);            // move away from fourth claw towards IR beacon
-  PIDDrive(20, 0.65, true, a, g, temp);   // bump into IR sensor
+  PIDDrive(20, 0.65, true, a, g, temp);  // bump into IR sensor
   resetGyro();
   PIDDrive(-6, 0.42, true, a, g, temp); // reverse a bit
   PIDTurn(35, 1, a, g, temp);           // turn part of the way CCW to get back towards bridge
@@ -237,8 +240,6 @@ void loop()
   resetGyro();
   PIDDrive(150, 0.63, false, a, g, temp);
   PIDTurn(90, 2, a, g, temp);
-
-  
 
   // FOR 6TH GOLDEN TREASURE //
 
@@ -392,6 +393,10 @@ void getEEPROMVals()
   EEPROM.get(PID_PIR_ADDR, pIR);
   EEPROM.get(PID_PTURNIR_ADDR, pTurnIR);
   EEPROM.get(PID_DTURNIR_ADDR, dTurnIR);
+
+  EEPROM.get(GYRO_XOFF_ADDR, xOff);
+  EEPROM.get(GYRO_YOFF_ADDR, yOff);
+  EEPROM.get(GYRO_ZOFF_ADDR, zOff);
 }
 
 void alignRightCliff(float power)

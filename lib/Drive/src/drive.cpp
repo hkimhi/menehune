@@ -50,13 +50,6 @@ void driveMotor(PinName fowardPin, PinName reversePin, float power)
     pwm_start(reversePin, PWM_FREQ, (int)(32768 * abs(power)), TimerCompareFormat_t::RESOLUTION_16B_COMPARE_FORMAT);
   }
   else
-#define P_DRIVE 0.25
-#define I_DRIVE 0.000
-#define D_DRIVE 0.25
-#define FFT 0.2
-#define FFD 0.02
-#define LCOMP 1
-#define P_TURN_DRIVE 0.2
   {
     pwm_start(reversePin, PWM_FREQ, 0, TimerCompareFormat_t::RESOLUTION_16B_COMPARE_FORMAT);
     pwm_start(fowardPin, PWM_FREQ, 0, TimerCompareFormat_t::RESOLUTION_16B_COMPARE_FORMAT);

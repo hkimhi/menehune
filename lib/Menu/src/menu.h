@@ -16,7 +16,7 @@
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
 #define OLED_RESET -1    // This display does not have a reset pin accessible
 
-#define NUM_MENU_ITEMS 4
+#define NUM_MENU_ITEMS 5
 #define NUM_MAX_OPTIONS 4
 
 // Function Declarations
@@ -27,17 +27,19 @@ void initializeMenu();
 class Option
 {
 public:
-    Option(String name, int val, int maxVal, void (*func)(int));
-    Option(String name, float val, float maxVal, void (*func)(float));
+    Option(String name, int val, int minVal, int maxVal, void (*func)(int));
+    Option(String name, float val, float minVal, float maxVal, void (*func)(float));
 
     String name;
     bool isInt;
 
     int intVal;
+    int intMinVal;
     int intMaxVal;
     void (*intFunc)(int);
 
     float floatVal;
+    float floatMinVal;
     float floatMaxVal;
     void (*floatFunc)(float);
 };

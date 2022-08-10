@@ -11,20 +11,22 @@ Item::Item(String name, std::vector<Option> options)
     this->options = options;
 }
 
-Option::Option(String name, int val, int maxVal, void (*func)(int))
+Option::Option(String name, int val, int minVal, int maxVal, void (*func)(int))
 {
     isInt = true;
     this->name = name;
     this->intVal = val;
+    this->intMinVal = minVal;
     this->intMaxVal = maxVal;
     this->intFunc = func;
 }
 
-Option::Option(String name, float val, float maxVal, void (*func)(float))
+Option::Option(String name, float val, float minVal, float maxVal, void (*func)(float))
 {
     isInt = false;
     this->name = name;
     this->floatVal = val;
+    this->floatMinVal = minVal;
     this->floatMaxVal = maxVal;
     this->floatFunc = func;
 }
@@ -34,29 +36,32 @@ Item items[NUM_MENU_ITEMS] = {
     Item("default1", std::vector<Option>()),
     Item("default2", std::vector<Option>()),
     Item("default3", std::vector<Option>()),
-    Item("default4", std::vector<Option>())
+    Item("default4", std::vector<Option>()),
+    Item("default5", std::vector<Option>())
 };
 
 void initializeMenu()
 {
-    extern int referenceOneDutyCycle;
-    extern int referenceTwoDutyCycle;
+    extern int referenceOneDutyCycle, referenceTwoDutyCycle;
     extern int intakeServoClosedPosition;
     extern float turnSat;
-    extern float pTurn;
-    extern int pIR;
-    extern int pTurnIR;
-    extern int dTurnIR;
+    extern int pIR, pTurnIR, dTurnIR;
+    extern float xOff, yOff, zOff;
+    float tempXOff = xOff*1000;
+    float tempYOff = yOff*1000;
+    float tempZOff = zOff*1000;
 
-    std::vector<Option> enableOptions{Option("enable robot", shouldStart, 2, setStart)};
-    std::vector<Option> reflectanceOptions{Option("cliff ref", referenceOneDutyCycle, 255, setReflectanceOneReference), Option("line ref", referenceTwoDutyCycle, 255, setReflectanceTwoReference)};
-    std::vector<Option> driveOptions{Option("turnSat", turnSat, 1.0, setTurnSat), Option("pIR", pIR, 100, setPIR), Option("pTurnIR", pTurnIR, 1024, setPTurnIR), Option("dTurnIR", dTurnIR, 1024, setDTurnIR)};
-    std::vector<Option> intakeOptions{Option("closed position", intakeServoClosedPosition, 180, setClosedPosition)};
+    std::vector<Option> enableOptions{Option("enable robot", shouldStart, 0, 2, setStart)};
+    std::vector<Option> reflectanceOptions{Option("cliff ref", referenceOneDutyCycle, 0, 255, setReflectanceOneReference), Option("line ref", referenceTwoDutyCycle, 0, 255, setReflectanceTwoReference)};
+    std::vector<Option> driveOptions{Option("turnSat", turnSat, 0, 1.0, setTurnSat), Option("pIR", pIR, 0, 100, setPIR), Option("pTurnIR", pTurnIR, 0, 1024, setPTurnIR), Option("dTurnIR", dTurnIR, 0, 1024, setDTurnIR)};
+    std::vector<Option> intakeOptions{Option("closed position", intakeServoClosedPosition, 0, 180, setClosedPosition)};
+    std::vector<Option> gyroOptions{Option("tune gyro", shouldRunOffset, 0, 2, setOffset), Option("xOff", tempXOff, tempXOff, tempXOff, [](float x){}), Option("yOff", tempYOff, tempYOff, tempYOff, [](float y){}), Option("zOff", tempZOff, tempZOff, tempZOff, [](float z){})};
 
     items[0] = Item("Enable", enableOptions);
     items[1] = Item("Reflect", reflectanceOptions);
     items[2] = Item("Intake", intakeOptions);
     items[3] = Item("Drive", driveOptions);
+    items[4] = Item("Gyro", gyroOptions);
 }
 
 int selectedItem = 0;
@@ -186,11 +191,11 @@ void enterItem(Adafruit_SSD1306 display, Item &item)
 
             if (item.options[i].isInt)
             {
-                display.println(map(pot_val, 0, 3300, 0, item.options[i].intMaxVal));
+                display.println(map(pot_val, 0, 3300, item.options[i].intMinVal, item.options[i].intMaxVal));
             }
             else
             {
-                display.println(mapf(pot_val, 0, 3300, 0, item.options[i].floatMaxVal));
+                display.println(mapf(pot_val, 0, 3300, item.options[i].floatMinVal, item.options[i].floatMaxVal));
             }
         }
         else
@@ -215,12 +220,12 @@ void enterItem(Adafruit_SSD1306 display, Item &item)
         // button pressed --> save value
         if (item.options[selectedOption].isInt)
         {
-            item.options[selectedOption].intVal = map(pot_val, 0, 3300, 0, item.options[selectedOption].intMaxVal);
+            item.options[selectedOption].intVal = map(pot_val, 0, 3300, item.options[selectedOption].intMinVal, item.options[selectedOption].intMaxVal);
             item.options[selectedOption].intFunc(item.options[selectedOption].intVal);
         }
         else
         {
-            item.options[selectedOption].floatVal = mapf(pot_val, 0, 3300, 0, item.options[selectedOption].floatMaxVal);
+            item.options[selectedOption].floatVal = mapf(pot_val, 0, 3300, item.options[selectedOption].floatMinVal, item.options[selectedOption].floatMaxVal);
             item.options[selectedOption].floatFunc(item.options[selectedOption].floatVal);
         }
     }

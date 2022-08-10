@@ -23,11 +23,11 @@ void readGyro(sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp)
 
   my_mpu.getEvent(&accel, &gyro, &temp);
   if (abs(gyro.gyro.x - XOFF) >= MIN_GYRO)
-    x += ( 0.5 * (gyro.gyro.x + lastX )- XOFF) * CONV * (millis() - timeLastCall) / 1000;
+    x += (0.5 * (gyro.gyro.x + lastX) - XOFF) * CONV * (millis() - timeLastCall) / 1000;
   if (abs(gyro.gyro.y - YOFF) >= MIN_GYRO)
-    y += (0.5 * (gyro.gyro.y + lastY ) - YOFF) * CONV * (millis() - timeLastCall) / 1000;
+    y += (0.5 * (gyro.gyro.y + lastY) - YOFF) * CONV * (millis() - timeLastCall) / 1000;
   if (abs(gyro.gyro.z - ZOFF) >= MIN_GYRO)
-    z += ((0.5 * (gyro.gyro.z+ lastZ )) - ZOFF) * CONV * (millis() - timeLastCall) / 1000;
+    z += ((0.5 * (gyro.gyro.z + lastZ)) - ZOFF) * CONV * (millis() - timeLastCall) / 1000;
   timeLastCall = millis();
   lastX = gyro.gyro.x;
   lastY = gyro.gyro.y;
@@ -84,6 +84,16 @@ float gyroTune(sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp
     display1.println(zInt / i * 1000);
     display1.display();
   }
+  
+  shouldRunOffset = 0;
+  xOff = xInt / i;
+  yOff = yInt / i;
+  zOff = zInt / i;
+
+  EEPROM.put(GYRO_XOFF_ADDR, xOff);
+  EEPROM.put(GYRO_YOFF_ADDR, yOff);
+  EEPROM.put(GYRO_ZOFF_ADDR, zOff);
+
   return zInt / i;
 }
 

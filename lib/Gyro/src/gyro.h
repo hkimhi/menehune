@@ -4,12 +4,18 @@
 #include <Adafruit_MPU6050.h>
 #include <Adafruit_SSD1306.h>
 #include <Adafruit_Sensor.h>
+#include "utils.h"
+#include "EEPROM.h"
 
 #define MIN_GYRO 0.001
 #define CONV (180 / 3.14)
 #define XOFF 38.16/1000
 #define YOFF -24.54/1000
 #define ZOFF -44.90/1000
+
+#define GYRO_XOFF_ADDR 32
+#define GYRO_YOFF_ADDR 36
+#define GYRO_ZOFF_ADDR 40
 
 extern float xOff, yOff, zOff; // offsets for x, y, z positions
 extern volatile float x, y, z; // will store value of x, y, z positions

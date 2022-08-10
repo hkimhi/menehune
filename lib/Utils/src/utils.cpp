@@ -1,6 +1,7 @@
 #include "utils.h"
 
 int shouldStart = 0;
+int shouldRunOffset = 0;
 
 /**
  * @brief Provides functionality like the standard map() function but for floats
@@ -25,4 +26,8 @@ float mapf(float input, float inFrom, float inTo, float outFrom, float outTo) {
  */
 void setStart(int val) {
     shouldStart = val;
+}
+
+void setOffset(int val) {
+    shouldRunOffset = val;
 }
