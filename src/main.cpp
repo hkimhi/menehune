@@ -100,7 +100,6 @@ void loop()
       gyroTune(a, g, temp);
       initializeMenu();
     }
-
     displayMenu(display2);
     displayInfoScreen(display1);
   }
@@ -111,15 +110,10 @@ void loop()
   delay(500);
   prepareClaw();
 
-  PIDDrive(173, 0.63, false, a, g, temp); // drive up starting ramp
 
-  while (1)
-  {
-    readGyro(a, g, temp);
-    printGyro();
-  }
-
+  PIDDrive(173, 0.7, false, a, g, temp); // drive up starting ramp
   PIDDrive(16, 0.42, true, a, g, temp); // drive at first pedestal
+  resetGyro();
   onHit();
   delay(100);
   PIDDrive(-14, 0.42, false, a, g, temp); // reverse from first pedestal
@@ -148,9 +142,9 @@ void loop()
   PIDTurn(90, 0, a, g, temp); // turn towards the arch to go through
   if (PIDDrive(51, 0.42, true, a, g, temp))
   { // Try drive through arc, if fails turn and try again
-    PIDTurn(-10, 0, a, g, temp);
+    PIDTurn(80, 0, a, g, temp);
     PIDDrive(10, 0.45, true, a, g, temp);
-    PIDTurn(0, 0, a, g, temp);
+    PIDTurn(90, 0, a, g, temp);
     PIDDrive(48, 0.45, true, a, g, temp);
   }
 
