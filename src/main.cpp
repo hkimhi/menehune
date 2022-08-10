@@ -92,7 +92,7 @@ void setup(void)
 void loop()
 {
   resetTimer();
-  // gyroTune(a,g,temp);
+  //gyroTune(a,g,temp);
   // while (1)
   // {
   //   readGyro(a,g,temp);
@@ -108,7 +108,7 @@ void loop()
   
   driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0);
   driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0);
-
+  resetGyro();
   delay(500);
   intakeServo.write(INTAKE_SERVO_OPEN_POS);
  

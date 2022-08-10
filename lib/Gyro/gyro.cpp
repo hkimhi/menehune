@@ -27,9 +27,11 @@ void readGyro(sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp)
   if (abs(gyro.gyro.y - YOFF) >= MIN_GYRO)
     y += (0.5 * (gyro.gyro.y + lastY ) - YOFF) * CONV * (millis() - timeLastCall) / 1000;
   if (abs(gyro.gyro.z - ZOFF) >= MIN_GYRO)
-    z += (0.5 * (gyro.gyro.z+ lastZ ) - ZOFF) * CONV * (millis() - timeLastCall) / 1000;
+    z += ((0.5 * (gyro.gyro.z+ lastZ )) - ZOFF) * CONV * (millis() - timeLastCall) / 1000;
   timeLastCall = millis();
   lastX = gyro.gyro.x;
+  lastY = gyro.gyro.y;
+  lastZ = gyro.gyro.z;
 }
 
 /**
