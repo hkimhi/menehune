@@ -156,9 +156,9 @@ void PIDTurn(float setPoint, int dir, sensors_event_t accel, sensors_event_t gyr
  * @param accel acceleration sensor event (xyz acceleration)
  * @param gyro gyro sensor event (xyz rotational velocity)
  * @param temp temperature sensor event
- * @return None
+ * @return true if the operation timed out
  */
-void PIDDrive(float dist, float satDr, bool isTimeout, sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp)
+bool PIDDrive(float dist, float satDr, bool isTimeout, sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp)
 {
   float iSat = 100;
   int error, prevError, errorSum = 0;
@@ -166,6 +166,7 @@ void PIDDrive(float dist, float satDr, bool isTimeout, sensors_event_t accel, se
   float power, turnPower;
   int start = counter;
   int timeout = 0;
+  int targetCount = 0;
   drive = true;
   float setPoint = (dist / (6.28 * 3.5)) * 48;
   readGyro(accel, gyro, temp);
@@ -173,7 +174,7 @@ void PIDDrive(float dist, float satDr, bool isTimeout, sensors_event_t accel, se
   driveMotor(LEFT_FOWARD, LEFT_REVERSE, copysign(satDr, dist));
   driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, copysign(satDr, dist));
   resetTimer();
-  while (timeout < 15)
+  while (timeout < 15 && targetCount < 10)
   {
 
     readGyro(accel, gyro, temp);
@@ -196,9 +197,12 @@ void PIDDrive(float dist, float satDr, bool isTimeout, sensors_event_t accel, se
 
     power = clip(power, -satDr, satDr);
 
-    if (((prevError == error) && isTimeout) || (abs(error + prevError) <= 2 && (turnError < 2)))
+    if (((prevError == error) && isTimeout))
     {
       timeout++;
+    }
+    if((abs(error + prevError) <= 2 && (turnError < 2))){
+      targetCount++;
     }
     prevError = error;
     //delay(5);
@@ -220,6 +224,7 @@ void PIDDrive(float dist, float satDr, bool isTimeout, sensors_event_t accel, se
   // Stop Motors after Reaching destination
   driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0);
   driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0);
+  return (isTimeout && (timeout >= 10));
 }
 
 /**

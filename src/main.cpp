@@ -85,37 +85,26 @@ void setup(void)
   display1.setCursor(0, 0);
   display1.println("MPU6050 Found!");
   display1.display();
-
+  calibrateGyro(a, g, temp);
   delay(100);
 }
 
 void loop()
 {
   resetTimer();
-  while (1)
-  {
-    printGyro();
-    readGyro(a,g,temp);
-  }
-  // gyroTuningLoop(a,g,temp);
-  // calibrateGyro(a, g, temp);
-
+  // gyroTune(a,g,temp);
+  // while (1)
+  // {
+  //   readGyro(a,g,temp);
+  //   printGyro();
+  // }
+  
   while (shouldStart == 0)
   {
     displayMenu(display2);
     displayInfoScreen(display1);
   }
-  // while(1){
-  //   // driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.4);
-  //   // driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0.4);
-  //   onHit();
-  //   delay(500);
-  //   driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0);
-  //   driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0);
-  //   prepareClaw();
-  //   delay(500);
-  //   printIntake();
-  // }
+
   
   driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0);
   driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0);
@@ -134,9 +123,9 @@ void loop()
   unprepareClaw();
   PIDTurn(35, 0, a, g, temp);
   minDrive(1);
-  PIDTurn(87, 1, a, g, temp);
+  PIDTurn(84, 1, a, g, temp);
   PIDDrive(47, 0.42, true, a, g, temp); // cross chicken wire
-  PIDTurn(67, 1, a, g, temp);
+  PIDTurn(77, 1, a, g, temp);
 
 
   prepareClaw();
@@ -151,9 +140,14 @@ void loop()
   delay(200);
 
   PIDTurn(32, 0, a, g, temp);
-  PIDDrive(19, 0.39, true, a, g, temp);
+  PIDDrive(21, 0.40, true, a, g, temp);
   PIDTurn(90, 0, a, g, temp);            // turn towards the arch to go through
-  PIDDrive(51, 0.42, false, a, g, temp); // drive through arch
+  if(PIDDrive(51, 0.42, false, a, g, temp)){ // Try drive through arc, if fails turn and try again
+    PIDTurn(-10, 0, a,g,temp);
+    PIDDrive(10, 0.45, true, a,g,temp);
+    PIDTurn(0, 0, a,g,temp);
+    PIDDrive(48, 0.45, true, a,g,temp);
+  } 
   
   
   PIDTurn(180, 0, a, g, temp);           // turn towards third pedestal
@@ -161,29 +155,41 @@ void loop()
 
   prepareClaw();                         // open claw
   delay(200);
-  PIDDrive(30, 0.5, true, a, g, temp); // drive at third pedestal
+  PIDDrive(20, 0.46, true, a, g, temp); // drive at third pedestal
   onHit();                             // collect third treasure
   delay(500);
 
-  PIDDrive(-20, 0.55, false, a, g, temp); // Back away from third pedestal
-  unprepareClaw();                        // close claw for safe storage during transprt
+  if(PIDDrive(-20, 0.67, true, a, g, temp)){ // try to back away from first pedestal
+    //PIDDrive(-20, 0.7, true, a, g, temp); //Try again if stuck
+  } 
+  unprepareClaw();
+  delay(300);
+                          // close claw for safe storage during transprt
   PIDTurn(90, 1, a, g, temp);             // aim towards IR beacon
   
   PIDDrive(70, 0.43, false, a, g, temp);  // drive to position by fourth pedestal
   PIDTurn(0, 0, a, g, temp);              // turn towards fourth pedestal
   prepareClaw();                          // open claw
-  PIDDrive(38, 0.36, true, a, g, temp);   // drive at fourth pedestal
+  PIDDrive(38, 0.42, true, a, g, temp);   // drive at fourth pedestal
   onHit();                                // collect fourth treasure
   delay(200);
 
   PIDDrive(-20, 0.5, false, a, g, temp); // Back away from fourth pedestal
   unprepareClaw();                       // close claw for safe storage during transport
   PIDTurn(90, 0, a, g, temp);            // move away from fourth claw towards IR beacon
-  PIDDrive(4, 0.42, true, a, g, temp);  // poisiton to drop bridge
+  PIDDrive(15, 0.6, true, a, g, temp);  // poisiton to drop bridge
   resetGyro();
+  PIDDrive(-6, 0.42, true, a, g, temp);  // poisiton to drop bridge
   PIDTurn(35, 1, a, g, temp);            // turn part of the way CCW to get back towards bridge
   PIDDrive(10, 0.42, true, a, g, temp); // drive forward a bit
   PIDTurn(90, 0, a, g, temp);            // turn the rest of the way CCW to get back perpendicular to cliff
+  PIDDrive(25, 0.6, true, a, g, temp); // drive forward a bit
+
+  driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.0);
+  driveMotor(LEFT_FOWARD, LEFT_REVERSE,0.0);
+  resetGyro();
+  PIDDrive(-57, 0.42, true, a, g, temp); 
+  
   minDriveReverse();                     // backup super slowly until it sees the cliff
   driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.6);
   driveMotor(LEFT_FOWARD, LEFT_REVERSE,0.6);
@@ -197,23 +203,24 @@ void loop()
   PIDDrive(19, 0.42, false, a, g, temp); // drive forward a bit
 
   PIDDrive(-75, 0.7, false, a, g, temp); // drive backwards very quickly to power up the bridge
-  PIDDrive(10, 0.42, false, a, g, temp); // drive forward a bit
-  resetGyro();
+  PIDDrive(-25, 0.45, true, a, g, temp); // drive backwards very quickly to power up the bridge
+
+  PIDDrive(26, 0.42, false, a, g, temp); // drive forward a bit
   delay(200);
 
   PIDTurn(-45, 2, a, g, temp);         // rotate towards 5th pedestal
-  PIDDrive(-5, 0.42, true, a, g, temp);
-  PIDTurn(-80, 2, a, g, temp);         // rotate towards 5th pedestal
+  PIDDrive(-12, 0.42, true, a, g, temp);
+  PIDTurn(-82, 2, a, g, temp);         // rotate towards 5th pedestal
+  PIDDrive(-4.5, 0.42, true, a, g, temp);
 
-  PIDDrive(-10, 0.42, true, a, g, temp);
 
   prepareClaw();                       // open claw for pickup
   PIDDrive(20, 0.42, true, a, g, temp); // drive towards 5th pedestal
   onHit();                             // pickup 5th treasure
   delay(200);
-  PIDDrive(-10, 0.5, true, a, g, temp); // drive backwards towards center of platform
+  PIDDrive(-12, 0.5, true, a, g, temp); // drive backwards towards center of platform
   unprepareClaw();
-  PIDTurn(-180, 2, a, g, temp);
+  PIDTurn(-155, 2, a, g, temp);
   PIDDrive(-7, 0.5, true, a, g, temp); // drive backwards towards center of platform
   intakeServo.write(INTAKE_SERVO_OPEN_POS);
   delay(500);
@@ -221,8 +228,13 @@ void loop()
   for (int i = 0; i < 5; i++)
   {
     PIDDrive(-10, 0.7, true, a, g, temp);
-    PIDDrive(10, 0.7, true, a, g, temp);
+    PIDDrive(12, 0.7, true, a, g, temp);
   }
+  PIDDrive(-15, 0.7, true, a, g, temp);
+
+  PIDTurn(-270, 2, a, g, temp);
+  resetGyro();
+  PIDDrive(150, 0.63, false, a, g, temp); 
   PIDTurn(90, 2, a, g, temp);
 
   
@@ -393,11 +405,12 @@ void alignRightCliff(float power)
       driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, power);
       driveMotor(LEFT_FOWARD, LEFT_REVERSE, power);
       readGyro(a, g, temp);
+      delay(10);
     }
     delay(70);
     turnInc = 0;
     resetTimer();
-    while (digitalRead(REFLECTANCE_ONE) && getBumperState())
+    while (digitalRead(REFLECTANCE_ONE))
     {
       enc = counter;
       if (abs(enc - prevEnc) < 1)
@@ -441,7 +454,7 @@ void minDriveReverse()
     }
     else
     {
-      powerInc = powerInc - 2;
+      powerInc = powerInc - 3;
     }
     prevEnc = enc;
     driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, (-powerInc / 1024.0) - 0.15);
