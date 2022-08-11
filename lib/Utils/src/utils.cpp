@@ -1,6 +1,7 @@
 #include "utils.h"
 
 int shouldStart = 0;
+int shouldYolo = 0;
 int shouldRunOffset = 0;
 
 /**
@@ -30,4 +31,8 @@ void setStart(int val) {
 
 void setOffset(int val) {
     shouldRunOffset = val;
+}
+
+void setYolo(int val) {
+    shouldYolo = val;
 }

@@ -251,12 +251,13 @@ void loop()
   driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0.0);
   intakeEnabled = false;
   PIDDrive(-7, 0.4, false, false, a, g, temp);
-  // PIDTurn(0, 2, a, g, temp);
-  // PIDDrive(-8, 0.4, false, false, a, g, temp);
-  // PIDTurn(180, 2, a, g, temp);
-  // PIDDrive(-138, 0.5, false, true, a,g,temp);
-  // PIDTurn(100, 0, a, g, temp);
-  // PIDDrive(15, 0.5, true, false, a,g,temp);
+
+  if(shouldYolo != 0) {
+    PIDTurn(0, 2, a, g, temp);
+    PIDDrive(-138, 0.5, false, true, a,g,temp);
+    PIDTurn(98, 0, a, g, temp);
+    PIDDrive(10, 0.45, true, false, a,g,temp);
+  }
 
   while (1)
   {

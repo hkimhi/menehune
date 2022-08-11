@@ -51,7 +51,7 @@ void initializeMenu()
     float tempYOff = yOff*1000;
     float tempZOff = zOff*1000;
 
-    std::vector<Option> enableOptions{Option("enable robot", shouldStart, 0, 2, setStart)};
+    std::vector<Option> enableOptions{Option("enable robot", shouldStart, 0, 2, setStart), Option("spacer", 0, 0, 0, [](int a){}), Option("should yolo", shouldYolo, 0, 2, setYolo)};
     std::vector<Option> reflectanceOptions{Option("cliff ref", referenceOneDutyCycle, 0, 255, setReflectanceOneReference), Option("line ref", referenceTwoDutyCycle, 0, 255, setReflectanceTwoReference)};
     std::vector<Option> driveOptions{Option("turnSat", turnSat, 0, 1.0, setTurnSat), Option("pIR", pIR, 0, 100, setPIR), Option("pTurnIR", pTurnIR, 0, 1024, setPTurnIR), Option("dTurnIR", dTurnIR, 0, 1024, setDTurnIR)};
     std::vector<Option> intakeOptions{Option("closed position", intakeServoClosedPosition, 0, 180, setClosedPosition)};
