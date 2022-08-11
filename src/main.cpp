@@ -96,7 +96,7 @@ void setup(void)
 void loop()
 {
   resetTimer();
-  
+
   while (shouldStart == 0)
   {
     if (shouldRunOffset == 1)
@@ -115,7 +115,7 @@ void loop()
   resetGyro();
   delay(500);
   intakeEnabled = true;
-  
+
   prepareClaw();
 
   PIDDrive(173, 0.7, false, true, a, g, temp); // drive up starting ramp
@@ -232,30 +232,31 @@ void loop()
   PIDDrive(8, 0.45, false, false, a, g, temp); // drive forward a bit
   delay(200);
 
-  
   // PIDDrive(4, 0.5, false, a, g, temp);
   PIDTurn(90, 0, a, g, temp);
   // alignBrige(185, 0.6);
-  PIDDrive(138, 0.7, false, true, a,g,temp);
+  PIDDrive(138, 0.7, false, true, a, g, temp);
   resetGyro();
   prepareClaw();
   delay(500);
-  PIDTurn(25, 2, a,g,temp);
+  PIDTurn(25, 2, a, g, temp);
   while (getBumperState())
   {
+    // while front bumper hasn't hit anything
     driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.46);
     driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0.46);
   }
-  intakeServo.write(intakeServoClosedPosition);
+  intakeServo.write(intakeServoClosedPosition); // pick up golden treasure
   driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.0);
   driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0.0);
   intakeEnabled = false;
-  PIDDrive(-7, 0.4,false, false, a,g,temp);
-  PIDTurn(0, 2, a,g,temp);
-  PIDDrive(-138, 0.5, false, true, a,g,temp);
-  intakeServo.write(INTAKE_SERVO_OPEN_POS);
-  PIDTurn(90, 0, a, g, temp);
-  PIDDrive(15, 0.5, true, false, a,g,temp);
+  PIDDrive(-7, 0.4, false, false, a, g, temp);
+  // PIDTurn(0, 2, a, g, temp);
+  // PIDDrive(-8, 0.4, false, false, a, g, temp);
+  // PIDTurn(180, 2, a, g, temp);
+  // PIDDrive(-138, 0.5, false, true, a,g,temp);
+  // PIDTurn(100, 0, a, g, temp);
+  // PIDDrive(15, 0.5, true, false, a,g,temp);
 
   while (1)
   {
@@ -265,18 +266,8 @@ void loop()
     display1.setCursor(0, 0);
     display1.println("MPU6050 Found!");
     display1.display();
+    displayMenu(display2);
   }
-  
-  // FOR 6TH GOLDEN TREASURE //
-
-  PIDTurn(35, 0, a, g, temp);           // rotate towards 6th pedestal
-  prepareClaw();                        // open claw for 6th (golden) treasure
-  PIDDrive(8, 0.65, false, false, a, g, temp); // drive at 6th pedestal
-  onHit();                              // pick up 6th treasure
-  delay(500);
-  PIDDrive(-8, 0.5, false, false, a, g, temp); // drive backwards towards platform center
-
-  PIDTurn(-180, 0, a, g, temp); // rotate so back of robot is facing starting suspension bridge platform
 }
 
 void putEEPROMDefaults()
@@ -313,7 +304,7 @@ void getEEPROMVals()
 
 /**
  * @brief cliff alignment code
- * 
+ *
  * @param side if side == 0, use left cliff detection. otherwise, right cliff
  * @param power power to drive with
  */
@@ -324,7 +315,8 @@ void alignCliff(int side, float power)
   int enc, prevEnc = counter;
 
   int sensor = REFLECTANCE_ONE;
-  if(side == 0) {
+  if (side == 0)
+  {
     sensor = REFLECTANCE_TWO;
   }
 
@@ -360,15 +352,17 @@ void alignCliff(int side, float power)
       }
       readGyro(a, g, temp);
       // turn until right wing not detecting cliff
-      if(side == 1){
+      if (side == 1)
+      {
         driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.1);
         driveMotor(LEFT_FOWARD, LEFT_REVERSE, -0.3 - (turnInc / 128. - 0));
       }
-      else{
+      else
+      {
         driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0.1);
         driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, -0.3 - (turnInc / 128. - 0));
       }
-      
+
       prevEnc = enc;
       delay(10);
     }
@@ -383,14 +377,17 @@ void alignCliff(int side, float power)
   driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0);
 }
 
-void alignBrige(float distance, float powerSat){
+void alignBrige(float distance, float powerSat)
+{
   int startEnc = counter;
-  float finishCount = distance * 48  / (6.28 * 3.5);
-  float error, power, prevError = 0; 
+  float finishCount = distance * 48 / (6.28 * 3.5);
+  float error, power, prevError = 0;
   int arrivedCount = 0;
-  while(arrivedCount < 10){
-    readGyro(a,g,temp);
-    if(!digitalRead(REFLECTANCE_ONE) && !digitalRead(REFLECTANCE_TWO)){
+  while (arrivedCount < 10)
+  {
+    readGyro(a, g, temp);
+    if (!digitalRead(REFLECTANCE_ONE) && !digitalRead(REFLECTANCE_TWO))
+    {
       error = finishCount - counter;
       power = error * 0.5;
       power += (error - prevError) * D_DRIVE;
@@ -398,15 +395,18 @@ void alignBrige(float distance, float powerSat){
       driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, power);
       driveMotor(LEFT_FOWARD, LEFT_REVERSE, power);
       prevError = error;
-      if(abs(error) < 3){
+      if (abs(error) < 3)
+      {
         arrivedCount++;
       }
     }
-    else if (digitalRead(REFLECTANCE_ONE)){
+    else if (digitalRead(REFLECTANCE_ONE))
+    {
       driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.3);
       driveMotor(LEFT_FOWARD, LEFT_REVERSE, -0.7);
     }
-    else {
+    else
+    {
       driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, -0.7);
       driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0.3);
     }
@@ -460,7 +460,7 @@ void minDrive(int dir)
     {
       powerInc++;
     }
-    else if(abs(enc - prevEnc) > 1)
+    else if (abs(enc - prevEnc) > 1)
     {
       powerInc -= 1;
     }
