@@ -7,7 +7,7 @@
 #include "utils.h"
 #include "EEPROM.h"
 
-#define MIN_GYRO 0.01
+#define MIN_GYRO 0.001
 #define CONV (180 / 3.14)
 
 #define GYRO_XOFF_ADDR 32

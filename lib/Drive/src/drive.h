@@ -44,6 +44,7 @@ extern float turnSat;
 extern int pIR;
 extern int pTurnIR;
 extern int dTurnIR;
+extern float turnDriveSat;
 
 void driveMotor(PinName fowardPin, PinName reversePin, float power);
 void PIDTurn(float setPoint, int dir, sensors_event_t a, sensors_event_t g, sensors_event_t temp);

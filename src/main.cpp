@@ -120,7 +120,7 @@ void loop()
 
   PIDDrive(173, 0.7, false, true, a, g, temp); // drive up starting ramp
   PIDDrive(16, 0.42, true, false, a, g, temp);  // drive at first pedestal
-  resetGyro();
+  delay(200);
   onHit();
   delay(100);
   PIDDrive(-14, 0.42, false, false, a, g, temp); // reverse from first pedestal
@@ -128,9 +128,13 @@ void loop()
   unprepareClaw();
   PIDTurn(35, 0, a, g, temp); //aim partially towards chicken wire
   minDrive(1);
-  PIDTurn(83, 1, a, g, temp);
-  PIDDrive(50, 0.5, false, false, a, g, temp); // cross chicken wire
-  PIDTurn(73, 1, a, g, temp);
+  PIDTurn(85, 1, a, g, temp);
+  turnDriveSat = 0.2;
+  PIDDrive(50, 0.65, false, true, a, g, temp); // cross chicken wire
+  turnDriveSat = 0.6;
+  if(!digitalRead(REFLECTANCE_ONE)){
+    PIDTurn(75, 1, a, g, temp);
+  }
 
   prepareClaw();
   alignCliff(1, 0.42); // align against right cliff edge
@@ -188,18 +192,24 @@ void loop()
     driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.55);
     driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0.55);
   }
-  delay(200);
+  delay(500);
   driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0);
   driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0);
+  delay(200);
   resetGyro();
+
   PIDDrive(-9, 0.42, true, false, a, g, temp); // reverse a bit
   PIDTurn(35, 1, a, g, temp);           // turn part of the way CCW to get back towards bridge
   PIDDrive(10, 0.42, true, false, a, g, temp); // drive forward a bit
   PIDTurn(90, 0, a, g, temp);           // turn the rest of the way CCW to get back perpendicular to cliff
-  PIDDrive(25, 0.6, true, false, a, g, temp);  // drive forward a bit
-
-  driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.0);
-  driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0.0);
+    while(getBumperState()){
+    driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.55);
+    driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0.55);
+  }
+  delay(200);
+  driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0);
+  driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0);
+  delay(200);
   resetGyro();
   PIDDrive(-57, 0.42, true, false, a, g, temp);
 
@@ -235,6 +245,12 @@ void loop()
   intakeServo.write(intakeServoClosedPosition);
   intakeEnabled = false;
   PIDDrive(-7, 0.4,false, false, a,g,temp);
+  PIDTurn(0, 2, a,g,temp);
+  PIDDrive(-138, 0.5, false, true, a,g,temp);
+  intakeServo.write(INTAKE_SERVO_OPEN_POS);
+  PIDTurn(90, 0, a, g, temp);
+  PIDDrive(15, 0.5, true, false, a,g,temp);
+
   while (1)
   {
     display1.clearDisplay();
@@ -438,14 +454,14 @@ void minDrive(int dir)
     {
       powerInc++;
     }
-    else
+    else if(abs(enc - prevEnc) > 1)
     {
-      powerInc = powerInc - 1;
+      powerInc -= 1;
     }
     prevEnc = enc;
     driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, (0.35 + powerInc / 128.0) * dir - angleError * 0.2);
     driveMotor(LEFT_FOWARD, LEFT_REVERSE, (0.35 + powerInc / 128.0) * dir + angleError * 0.2);
-    delay(20);
+    delay(30);
   }
   driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.0);
   driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0.0);

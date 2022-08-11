@@ -8,6 +8,7 @@ float turnSat = 0.55;
 int pIR = 25;
 int pTurnIR = 50;
 int dTurnIR = 1000;
+float turnDriveSat = 0.55;
 
 volatile float counter = 0;
 volatile int ij = 0;
@@ -209,13 +210,15 @@ bool PIDDrive(float dist, float satDr, bool isTimeout, bool useEdgeSensors, sens
     
     if(useEdgeSensors && digitalRead(PA11)){
       turnPower += 0.6;
+      turnSet = z;
     }
     else if(useEdgeSensors && digitalRead(PA12)){
       turnPower -= 0.6;
+      turnSet = z;
     }
 
     // Clip Turnpower to Power to prevent robot from going backwards
-    turnPower = clip(turnPower, -0.6, 0.6);
+    turnPower = clip(turnPower, -turnDriveSat, turnDriveSat);
     turnPrevError = turnError;
 
     // Apply power to motors
