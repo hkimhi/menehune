@@ -22,12 +22,12 @@ void readGyro(sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp)
 {
 
   my_mpu.getEvent(&accel, &gyro, &temp);
-  if (abs(gyro.gyro.x - XOFF) >= MIN_GYRO)
-    x += (0.5 * (gyro.gyro.x + lastX) - XOFF) * CONV * (millis() - timeLastCall) / 1000;
-  if (abs(gyro.gyro.y - YOFF) >= MIN_GYRO)
-    y += (0.5 * (gyro.gyro.y + lastY) - YOFF) * CONV * (millis() - timeLastCall) / 1000;
-  if (abs(gyro.gyro.z - ZOFF) >= MIN_GYRO)
-    z += ((0.5 * (gyro.gyro.z + lastZ)) - ZOFF) * CONV * (millis() - timeLastCall) / 1000;
+  if (abs(gyro.gyro.x - xOff) >= MIN_GYRO)
+    x += (0.5 * (gyro.gyro.x + lastX) - xOff) * CONV * (millis() - timeLastCall) / 1000;
+  if (abs(gyro.gyro.y - yOff) >= MIN_GYRO)
+    y += (0.5 * (gyro.gyro.y + lastY) - yOff) * CONV * (millis() - timeLastCall) / 1000;
+  if (abs(gyro.gyro.z - zOff) >= MIN_GYRO)
+    z += ((0.5 * (gyro.gyro.z + lastZ)) - zOff) * CONV * (millis() - timeLastCall) / 1000;
   timeLastCall = millis();
   lastX = gyro.gyro.x;
   lastY = gyro.gyro.y;
@@ -67,7 +67,7 @@ float gyroTune(sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp
   int i = 0;
   float xInt, yInt, zInt;
   int startTime = millis();
-  while (millis() - startTime < 1000 * 30)
+  while (millis() - startTime < 1000 * 60)
   {
     i++;
     my_mpu.getEvent(&accel, &gyro, &temp);

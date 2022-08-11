@@ -33,6 +33,7 @@ void alignCliff(int, float);
 // void alignRightCliff(float power);
 void minDriveReverse();
 void minDrive(int dir);
+void alignBrige(float distance, float power);
 
 // GLOBAL VARIABLES //
 sensors_event_t a;    // acceleration sensor event
@@ -78,6 +79,7 @@ void setup(void)
   display2.setTextSize(1);
   display2.setTextColor(SSD1306_WHITE);
   display2.setCursor(0, 0);
+  display1.setRotation(2);
   display2.display();
 
   display1.clearDisplay();
@@ -85,6 +87,7 @@ void setup(void)
   display1.setTextColor(SSD1306_WHITE);
   display1.setCursor(0, 0);
   display1.println("MPU6050 Found!");
+  display2.setRotation(2);
   display1.display();
   calibrateGyro(a, g, temp);
   delay(100);
@@ -112,7 +115,7 @@ void loop()
   resetGyro();
   delay(500);
 
-  /*
+  
   prepareClaw();
 
   PIDDrive(173, 0.7, false, a, g, temp); // drive up starting ramp
@@ -130,7 +133,7 @@ void loop()
   PIDTurn(77, 1, a, g, temp);
 
   prepareClaw();
-  alignRightCliff(0.45); // align against right cliff edge
+  alignCliff(1, 0.45); // align against right cliff edge
   onHit();               // pick up second idol
   delay(200);
   resetGyro();
@@ -207,10 +210,10 @@ void loop()
   PIDDrive(19, 0.42, false, a, g, temp); // drive forward a bit
 
   PIDDrive(-75, 0.7, false, a, g, temp); // drive backwards very quickly to power up the bridge
-  */
-  PIDDrive(-25, 0.42, true, a, g, temp); // bump into zipline pole
+  
+  PIDDrive(-25, 0.45, true, a, g, temp); // bump into zipline pole
 
-  PIDDrive(26, 0.42, false, a, g, temp); // drive forward a bit
+  PIDDrive(11, 0.45, false, a, g, temp); // drive forward a bit
   delay(200);
 
   /*
@@ -246,60 +249,26 @@ void loop()
 
   // PIDDrive(4, 0.5, false, a, g, temp);
   PIDTurn(90, 0, a, g, temp);
-  alignCliff(0, 1);
-
-  // FOR 6TH GOLDEN TREASURE //
-
-  // drive up suspension bridge with cliff detection
-  int suspensionBridgeLength = 150;
-  int baseSpeed = 0.7;
-  int shift = counter;
-  int suspensionBridgeLengthCounterUnits = counter / 48 * (6.28 * 3.5) * suspensionBridgeLength;
-  // float setPoint = (dist / (6.28 * 3.5)) * 48;
-  while (counter < suspensionBridgeLengthCounterUnits + shift)
+  // alignBrige(185, 0.6);
+  PIDDrive(138, 0.7, false, a,g,temp);
+  resetGyro();
+  prepareClaw();
+  delay(500);
+  PIDTurn(25,0 , a,g,temp);
+  minDrive(1);
+  intakeServo.write(intakeServoClosedPosition);
+  intakeEnabled = false;
+  while (1)
   {
-    driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, baseSpeed);
-    driveMotor(LEFT_FOWARD, LEFT_REVERSE, baseSpeed);
-
-    if (digitalRead(REFLECTANCE_ONE))
-    {
-      // right wing cliff
-
-      // recover from cliff
-      driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.7);
-      driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0.3);
-      delay(250);
-
-      // re-align towards center
-      driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.5);
-      driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0.9);
-      delay(150);
-
-      // drive straight forward
-      driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, baseSpeed);
-      driveMotor(LEFT_FOWARD, LEFT_REVERSE, baseSpeed);
-    }
-    else if (digitalRead(REFLECTANCE_TWO))
-    {
-      // left wing cliff
-
-      // recover from cliff
-      driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.3);
-      driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0.7);
-      delay(250);
-
-      // re-align towards center
-      driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.9);
-      driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0.5);
-      delay(150);
-
-      // drive straight forward
-      driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, baseSpeed);
-      driveMotor(LEFT_FOWARD, LEFT_REVERSE, baseSpeed);
-    }
+    display1.clearDisplay();
+    display1.setTextSize(1);
+    display1.setTextColor(SSD1306_WHITE);
+    display1.setCursor(0, 0);
+    display1.println("MPU6050 Found!");
+    display1.display();
   }
-  driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0);
-  driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0);
+  
+  // FOR 6TH GOLDEN TREASURE //
 
   PIDTurn(35, 0, a, g, temp);           // rotate towards 6th pedestal
   prepareClaw();                        // open claw for 6th (golden) treasure
@@ -455,8 +424,15 @@ void alignCliff(int side, float power)
       }
       readGyro(a, g, temp);
       // turn until right wing not detecting cliff
-      driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.1);
-      driveMotor(LEFT_FOWARD, LEFT_REVERSE, -0.3 - (turnInc / 128. - 0));
+      if(side == 1){
+        driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.1);
+        driveMotor(LEFT_FOWARD, LEFT_REVERSE, -0.3 - (turnInc / 128. - 0));
+      }
+      else{
+        driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0.1);
+        driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, -0.3 - (turnInc / 128. - 0));
+      }
+      
       prevEnc = enc;
       delay(10);
     }
@@ -466,6 +442,39 @@ void alignCliff(int side, float power)
 
     // intakeEnabled = true;
     // prepareClaw();
+  }
+  driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0);
+  driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0);
+}
+
+void alignBrige(float distance, float powerSat){
+  int startEnc = counter;
+  float finishCount = distance * 48  / (6.28 * 3.5);
+  float error, power, prevError = 0; 
+  int arrivedCount = 0;
+  while(arrivedCount < 10){
+    readGyro(a,g,temp);
+    if(!digitalRead(REFLECTANCE_ONE) && !digitalRead(REFLECTANCE_TWO)){
+      error = finishCount - counter;
+      power = error * 0.5;
+      power += (error - prevError) * D_DRIVE;
+      power = clip(power, -powerSat, powerSat);
+      driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, power);
+      driveMotor(LEFT_FOWARD, LEFT_REVERSE, power);
+      prevError = error;
+      if(abs(error) < 3){
+        arrivedCount++;
+      }
+    }
+    else if (digitalRead(REFLECTANCE_ONE)){
+      driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.3);
+      driveMotor(LEFT_FOWARD, LEFT_REVERSE, -0.7);
+    }
+    else {
+      driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, -0.7);
+      driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0.3);
+    }
+    delay(20);
   }
   driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0);
   driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0);
