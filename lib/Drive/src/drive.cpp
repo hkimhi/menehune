@@ -190,7 +190,7 @@ bool PIDDrive(float dist, float satDr, bool isTimeout, sensors_event_t accel, se
 
     power = clip(power, -satDr, satDr);
 
-    if (((prevError == error) && isTimeout) && abs(error + prevError) > 2)
+    if (((prevError == error) && isTimeout) && (abs(error + prevError) > 2 || (turnError >= 2)))
     {
       timeout++;
     }

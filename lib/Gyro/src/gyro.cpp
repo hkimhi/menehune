@@ -85,7 +85,6 @@ float gyroTune(sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp
     display1.display();
   }
   
-  shouldRunOffset = 0;
   xOff = xInt / i;
   yOff = yInt / i;
   zOff = zInt / i;

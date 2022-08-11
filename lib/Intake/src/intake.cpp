@@ -35,14 +35,16 @@ void printIntake()
  */
 void onHit()
 {
-  for(int i = 0; i < 140; i+=5){
-     if (intakeEnabled && digitalRead(HALL_INPUT))
+  for (int i = 0; i < 140; i += 5)
+  {
+    if (intakeEnabled && digitalRead(HALL_INPUT))
     {
+      // intake enabled & not detecting a magnet
       intakeServo.write(i);
       printIntake();
     }
     else
-    {      
+    {
       intakeServo.write(INTAKE_SERVO_OPEN_POS);
       i += 70;
     }
@@ -73,7 +75,7 @@ void prepareClaw()
   intakeServo.write(INTAKE_SERVO_OPEN_POS);
   intakeEnabled = true;
   currentlySeesBomb = false;
-  delay(200);
+  delay(500);
 }
 
 /**
