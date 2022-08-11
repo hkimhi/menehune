@@ -4,7 +4,7 @@
 // GLOBAL VARIABLES //
 extern Adafruit_SSD1306 display1;
 
-float turnSat = 0.6;
+float turnSat = 0.55;
 int pIR = 25;
 int pTurnIR = 50;
 int dTurnIR = 1000;
@@ -151,7 +151,7 @@ void PIDTurn(float setPoint, int dir, sensors_event_t accel, sensors_event_t gyr
  * @param temp temperature sensor event
  * @return true if the operation timed out
  */
-bool PIDDrive(float dist, float satDr, bool isTimeout, sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp)
+bool PIDDrive(float dist, float satDr, bool isTimeout, bool useEdgeSensors, sensors_event_t accel, sensors_event_t gyro, sensors_event_t temp)
 {
   float iSat = 100;
   int error, prevError, errorSum = 0;
@@ -190,14 +190,14 @@ bool PIDDrive(float dist, float satDr, bool isTimeout, sensors_event_t accel, se
 
     power = clip(power, -satDr, satDr);
 
-    if (((prevError == error) && isTimeout) && (abs(error + prevError) > 2 || (turnError >= 2)))
+    if (((prevError == error) && isTimeout) && (abs(error + prevError) > 2 || (turnError >= 1.5)))
     {
       timeout++;
     }
     else{
       timeout = 0;
     }
-    if((abs(error + prevError) <= 2 && (turnError < 2))){
+    if((abs(error + prevError) <= 2 && (turnError < 1.5))){
       targetCount++;
     }
     prevError = error;
@@ -207,8 +207,15 @@ bool PIDDrive(float dist, float satDr, bool isTimeout, sensors_event_t accel, se
     turnPower = (turnError * P_TURN_DRIVE);
     turnPower += (turnError - turnPrevError) * D_TURN_DRIVE;
     
+    if(useEdgeSensors && digitalRead(PA11)){
+      turnPower += 0.6;
+    }
+    else if(useEdgeSensors && digitalRead(PA12)){
+      turnPower -= 0.6;
+    }
+
     // Clip Turnpower to Power to prevent robot from going backwards
-    turnPower = clip(turnPower, -abs(power), abs(power));
+    turnPower = clip(turnPower, -0.6, 0.6);
     turnPrevError = turnError;
 
     // Apply power to motors
