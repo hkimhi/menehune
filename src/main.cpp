@@ -29,7 +29,8 @@ extern int intakeServoClosedPosition;
 // FUNCTION DECLARATION //
 void putEEPROMDefaults();
 void getEEPROMVals();
-void alignRightCliff(float power);
+void alignCliff(int, float);
+// void alignRightCliff(float power);
 void minDriveReverse();
 void minDrive(int dir);
 
@@ -240,8 +241,12 @@ void loop()
   PIDTurn(-270, 1, a, g, temp);
   resetGyro();
   PIDDrive(150, 0.63, false, a, g, temp);
-  */
   PIDTurn(90, 1, a, g, temp);
+  */
+
+  // PIDDrive(4, 0.5, false, a, g, temp);
+  PIDTurn(90, 0, a, g, temp);
+  alignCliff(0, 1);
 
   // FOR 6TH GOLDEN TREASURE //
 
@@ -401,15 +406,27 @@ void getEEPROMVals()
   EEPROM.get(GYRO_ZOFF_ADDR, zOff);
 }
 
-void alignRightCliff(float power)
+/**
+ * @brief cliff alignment code
+ * 
+ * @param side if side == 0, use left cliff detection. otherwise, right cliff
+ * @param power power to drive with
+ */
+void alignCliff(int side, float power)
 {
   // while loop to drive along right cliff edge towards the pedestal until we hit the pedestal with the bumper
   int turnInc, turnIter = 0;
   int enc, prevEnc = counter;
+
+  int sensor = REFLECTANCE_ONE;
+  if(side == 0) {
+    sensor = REFLECTANCE_TWO;
+  }
+
   while (getBumperState())
   {
     resetTimer();
-    while (!digitalRead(REFLECTANCE_ONE) && getBumperState())
+    while (!digitalRead(sensor) && getBumperState())
     {
       // turn until right wing not detecting cliff
       driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, power);
@@ -420,7 +437,7 @@ void alignRightCliff(float power)
     delay(70);
     turnInc = 0;
     resetTimer();
-    while (digitalRead(REFLECTANCE_ONE))
+    while (digitalRead(sensor))
     {
       enc = counter;
       if (abs(enc - prevEnc) < 1)
