@@ -96,7 +96,7 @@ void setup(void)
 void loop()
 {
   resetTimer();
-
+  
   while (shouldStart == 0)
   {
     if (shouldRunOffset == 1)
@@ -114,12 +114,12 @@ void loop()
   driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0);
   resetGyro();
   delay(500);
-
+  intakeEnabled = true;
   
   prepareClaw();
 
   PIDDrive(173, 0.7, false, true, a, g, temp); // drive up starting ramp
-  PIDDrive(16, 0.42, true, false, a, g, temp);  // drive at first pedestal
+  PIDDrive(22, 0.42, true, false, a, g, temp);  // drive at first pedestal
   delay(200);
   onHit();
   delay(100);
@@ -241,8 +241,14 @@ void loop()
   prepareClaw();
   delay(500);
   PIDTurn(25, 2, a,g,temp);
-  minDrive(1);
+  while (getBumperState())
+  {
+    driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.46);
+    driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0.46);
+  }
   intakeServo.write(intakeServoClosedPosition);
+  driveMotor(RIGHT_FOWARD, RIGHT_REVERSE, 0.0);
+  driveMotor(LEFT_FOWARD, LEFT_REVERSE, 0.0);
   intakeEnabled = false;
   PIDDrive(-7, 0.4,false, false, a,g,temp);
   PIDTurn(0, 2, a,g,temp);
